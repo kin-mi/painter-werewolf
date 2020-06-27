@@ -26,13 +26,15 @@
     "types": [
       "@types/node",
       "@nuxt/types",
-      "@nuxtjs/firebase"
+      "@nuxtjs/firebase",
+      "firebase/"
     ],
     "typeRoots" : ["./src/types"]
   },
   "exclude": [
     "node_modules",
     ".nuxt",
-    "dist"
+    "dist",
+    "functions"
   ]
 }

@@ -1,62 +1,35 @@
 <template>
   <div class="container">
-    <div>
-      <logo />
-      <login v-if="!$accessor.auth.isLoggedIn" />
-      <p v-else class="subtitle">
-        welcome {{ $accessor.auth.user.playerName }}
-      </p>
-    </div>
+    <h1 class="title w-full">お絵かき人狼</h1>
+    <Login class="w-full" @loggedIn="goLobi" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import Logo from '~/components/Logo.vue'
 import Login from '~/components/Login.vue'
 
 export default Vue.extend({
   components: {
-    Logo,
     Login,
+  },
+  methods: {
+    goLobi(): void {
+      this.$router.push('lobi')
+    },
   },
 })
 </script>
 
 <style>
-/* Sample `apply` at-rules with Tailwind CSS
 .container {
-@apply min-h-screen flex justify-center items-center text-center mx-auto;
-}
-*/
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto;
 }
 
 .title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
   font-weight: 300;
-  font-size: 100px;
+  font-size: 80px;
   color: #35495e;
   letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
 }
 </style>

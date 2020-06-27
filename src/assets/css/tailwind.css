@@ -1,3 +1,50 @@
+/* purgecss start ignore */
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
+/* purgecss end ignore */
 @import 'tailwindcss/utilities';
+
+html, body {
+  font-size: 10px;
+}
+
+html body .container {
+  width: 960px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+#__nuxt {
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.nuxt-progress {
+  z-index: 1000000;
+  height: 3px !important;
+  background-image: linear-gradient(90deg, #00a0e9 0, #e5005a 100%) !important;
+  background-color: transparent !important;
+}
+
+.btn-primary {
+  background: #2363B8;
+  @apply inline-flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply btn-primary;
+  @apply text-white;
+  @apply font-bold;
+  @apply rounded-full;
+}
+
+.btn-primary:disabled {
+  background: #6B6B6B !important;
+  @apply inline-flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply btn-primary;
+  @apply text-white;
+  @apply font-bold;
+  @apply rounded-full;
+}

@@ -21,7 +21,14 @@ const config: Configuration = {
         content: process.env.npm_package_description || '',
       },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap',
+      },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    ],
   },
   /*
    ** Global CSS
@@ -31,7 +38,7 @@ const config: Configuration = {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [],
+  plugins: ['~/plugins/messenger', '~/plugins/room'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -87,6 +94,8 @@ const config: Configuration = {
           // onAuthStateChangedAction: 'onAuthStateChangedAction'
         },
       },
+      firestore: true,
+      realtimeDb: true,
     },
   },
   /*
