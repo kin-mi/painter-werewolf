@@ -1,4 +1,6 @@
 import { Configuration } from '@nuxt/types'
+require('dotenv').config()
+
 const config: Configuration = {
   srcDir: 'src',
   /*
@@ -78,20 +80,19 @@ const config: Configuration = {
    */
   firebase: {
     config: {
-      apiKey: 'AIzaSyAIT1MOCm4QlvbLITDmANmcIPdHVWQxaEg',
-      authDomain: 'painter-werewolf.firebaseapp.com',
-      databaseURL: 'https://painter-werewolf.firebaseio.com',
-      projectId: 'painter-werewolf',
-      storageBucket: 'painter-werewolf.appspot.com',
-      messagingSenderId: '537299849059',
-      appId: '1:537299849059:web:42065fb5d016ee520d8d56',
-      measurementId: 'G-3RQB0Y6LZ8',
+      apiKey: process.env.FIREBASE_API_KEY!,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN!,
+      databaseURL: process.env.FIREBASE_DATABASEURL!,
+      projectId: process.env.FIREBASE_PROJECT_ID!,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET!,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID!,
+      appId: process.env.FIREBASE_APP_ID!,
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID!,
     },
     services: {
       auth: {
         initialize: {
           onAuthStateChangedMutation: 'auth/ON_AUTH_STATE_CHANGED_MUTATION',
-          // onAuthStateChangedAction: 'onAuthStateChangedAction'
         },
       },
       firestore: true,
