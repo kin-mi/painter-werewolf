@@ -1,10 +1,10 @@
 <template>
-  <div class="h-64">
+  <div class="fixed bottom-0 w-full">
     <div
       ref="messageWrapper"
-      class="w-64 mt-2 bg-gray-200 border border-green-800 rounded-md shadow mx-auto max-h-full h-auto overflow-x-scroll overflow-y-scroll"
+      class="max-w-md max-h-screen-1/5 h-auto mt-2 mx-auto bg-gray-200 border border-green-800 rounded-md shadow overflow-x-scroll overflow-y-scroll"
     >
-      <div class="flex text-left text-xs">
+      <div class="w-full flex text-left text-xs">
         <div class="w-full h-auto flex flex-col">
           <div class="px-2 py-2 flex-1">
             <!-- message template -->
@@ -20,14 +20,12 @@
                       message.playerName
                     }}</span>
                     <span class="text-grey text-xs font-light">{{
-                      message.createAt
-                        ? `${('00' + message.createAt.getHours()).slice(-2)}:${(
-                            '00' + message.createAt.getMinutes()
-                          ).slice(-2)}`
-                        : ''
+                      $dayjs(message.createAt).format('HH:MM')
                     }}</span>
                   </div>
-                  <p class="font-light text-md text-grey-darkest pt-1">
+                  <p
+                    class="w-full font-light text-md text-gray-800 pt-1 break-words"
+                  >
                     {{ message.body }}
                   </p>
                 </div>
@@ -38,12 +36,13 @@
       </div>
     </div>
     <div
-      class="w-full flex mt-1 my-4 mb-4 rounded-lg border-2 border-green-800 overflow-hidden mx-auto"
+      class="max-w-md flex mt-1 my-4 mb-1 rounded-lg border-2 border-green-800 overflow-hidden mx-auto"
     >
       <input
         v-model="messageBody"
         type="text"
         class="w-full px-2 py-1 text-sm"
+        @keydown.enter="send"
       />
       <span
         class="text-sm leading-loose whitespace-no-wrap text-green-100 bg-green-800 px-3 border-l-2 border-green-800 cursor-pointer"
@@ -64,7 +63,7 @@ export default Vue.extend({
   },
   computed: {
     messageList(): Message[] {
-      return this.$messages.get()
+      return this.$messages.list
     },
   },
   watch: {
@@ -73,14 +72,22 @@ export default Vue.extend({
     },
   },
   async mounted(): Promise<void> {
-    this.$messages.listen()
+    this.$messages.attachMessageList(this.$room.info.id)
     await this.scrollToBottom()
   },
+  beforeDestroy() {
+    this.$messages.detachMessageList()
+  },
   methods: {
-    async send(): Promise<void> {
+    async send(event?: Event): Promise<void> {
+      if (event instanceof KeyboardEvent && event.keyCode !== 13) return
       if (this.messageBody) {
-        await this.$messages.push(this.messageBody)
+        const body = this.messageBody
         this.messageBody = ''
+        await this.$messages.push({
+          body,
+          roomId: this.$room.info.id,
+        })
       }
     },
     async scrollToBottom(): Promise<void> {

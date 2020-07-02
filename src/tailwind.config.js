@@ -15,6 +15,10 @@ module.exports = {
           darkness: 'B49653',
         },
       },
+      maxHeight: {
+        '0': '0',
+        'screen-1/5': '20vh',
+      },
     },
   },
   variants: {},

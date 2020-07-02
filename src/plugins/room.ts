@@ -2,14 +2,23 @@ import Vue from 'vue'
 import { Plugin } from '@nuxt/types'
 import { v4 as uuid } from 'uuid'
 import { firestore } from 'firebase'
-import { RoomStatus, OnlineStatus, CollectionName } from '~/utils/constant'
+import {
+  RoomStatus,
+  UserStatus,
+  CollectionName,
+  userColors,
+  UserColors,
+} from '~/utils/constant'
 
 type InjectTypeRoom = {
-  get(): Room
-  create(options: CreateParams): Promise<void>
+  info: Room
   list: Room[]
+  create(options: CreateParams): Promise<void>
   join(roomId: string): Promise<void>
-  attachRoom(): void
+  watch(roomId: string): Promise<void>
+  exit(roomId: string): Promise<void>
+  close(roomId: string): Promise<void>
+  attachRoom(roomId: string): void
   detachRoom(): void
   attachList(): void
   detachList(): void
@@ -32,28 +41,30 @@ declare module 'vue/types/vue' {
 export type RoomUser = {
   id: string
   playerName: string
-  status: OnlineStatus
+  status: UserStatus
+  color: UserColors
 }
 export type Room = {
   id: string
   status: RoomStatus
-  users: RoomUser[]
+  players: RoomUser[]
   watchers: RoomUser[]
+  createAt?: Date | firestore.Timestamp
+  updateAt?: Date | firestore.Timestamp
+  // ↓Parameters
   message: string
   turn: number
   limitPlayers: number
   watch: boolean
   chat: boolean
-  createAt?: Date | firestore.Timestamp
-  updateAt?: Date | firestore.Timestamp
 }
 type CreateParams = Pick<
   Room,
-  'turn' | 'limitPlayers' | 'watch' | 'chat' | 'message'
+  'message' | 'turn' | 'limitPlayers' | 'watch' | 'chat'
 >
 
 // Firestore Document Data to Room Object
-const _dataToRoom = (data: any): Room => {
+export const dataToRoom = (data: firestore.DocumentData): Room => {
   return {
     ...data,
     createAt:
@@ -87,33 +98,25 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   } as State)
 
   /******************************
-   * 新規部屋作成用関数
+   * 部屋を作成する
    * @param {CreateParams} params
    */
-  async function create({
-    message,
-    turn,
-    limitPlayers,
-    watch,
-    chat,
-  }: CreateParams): Promise<void> {
+  async function create(params: CreateParams): Promise<void> {
     const user = ctx.app.$accessor.auth.user
     // room payload
     const room = {
-      id: uuid().replace(/-/g, ''),
-      users: [
+      id: `${ctx.$dayjs().format('YYYYMMDDHHmmss')}${uuid().replace(/-/g, '')}`,
+      players: [
         {
           id: user.id,
           playerName: user.playerName,
           status: 'online',
+          color: userColors.black,
         } as RoomUser,
       ],
+      watchers: [],
       status: 'wait',
-      message,
-      turn,
-      limitPlayers,
-      watch,
-      chat,
+      ...params,
     } as Room
     // create room
     await ctx.app.$fireStore
@@ -129,30 +132,122 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
 
   /******************************
-   * 参加用関数
+   * 部屋に参加する
    * @param {string} roomId
    */
   async function join(roomId: string): Promise<void> {
+    const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
+    const roomDoc = await roomDocRef.get()
+    if (!roomDoc.exists) return
+
+    const user = ctx.app.$accessor.auth.user
+    const room = dataToRoom(roomDoc.data()!)
+    const userPayload = {
+      id: user.id,
+      playerName: user.playerName,
+      status: 'online',
+      color: _findNextColor(room),
+    } as RoomUser
+
+    const currentRoom = await _updateUserStatus(roomDocRef, userPayload)
+
+    // set current room
+    state.currentRoom = currentRoom!
+  }
+  // 次の色を探す
+  function _findNextColor(room: Room): UserColors {
+    const alreadyExistsColors = room.players
+      .filter((e) => e.status === 'online')
+      .map((e) => e.color)
+    console.log(alreadyExistsColors)
+    console.log(Object.values(userColors))
+    console.log(
+      Object.values(userColors).find((e) => !alreadyExistsColors.includes(e))
+    )
+    return (
+      Object.values(userColors).find((e) => !alreadyExistsColors.includes(e)) ||
+      userColors.black
+    )
+  }
+
+  /******************************
+   * 部屋から退出する
+   * @param {string} roomId
+   */
+  async function exit(roomId: string): Promise<void> {
+    const user = ctx.app.$accessor.auth.user
+    const joinedUser =
+      state.currentRoom.players.find(
+        (e) => e.id === user.id && e.status === 'online'
+      ) ||
+      state.currentRoom.watchers.find(
+        (e) => e.id === user.id && e.status === 'online'
+      )
+    if (!joinedUser) return
+
+    const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
+
+    const userPayload = {
+      ...joinedUser,
+      status: 'exit',
+    } as RoomUser
+
+    await _updateUserStatus(roomDocRef, userPayload)
+
+    // set current room
+    state.currentRoom = {} as Room
+  }
+
+  // 部屋にいるユーザーステータスを更新する
+  async function _updateUserStatus(
+    roomDocRef: firestore.DocumentReference,
+    user: RoomUser
+  ): Promise<Room | undefined> {
+    let room: Room | undefined
+    // Start transaction.
+    await ctx.app.$fireStore.runTransaction(async (trn) => {
+      // 現在の部屋情報を取得
+      const roomSnap = await trn.get(roomDocRef)
+      if (!roomSnap.exists) throw new Error(`Not found room. ${roomDocRef.id}`)
+      room = dataToRoom(roomSnap.data()!)
+      console.log('user', user)
+      console.log('room.players', room.players)
+      const targetUserIdx = room.players.findIndex(
+        (e) => e.id === user.id && e.status === 'online'
+      )
+      if (targetUserIdx !== -1) {
+        room.players.splice(targetUserIdx, 1, user)
+      } else {
+        room.players.push(user)
+      }
+      trn.update(roomDocRef, {
+        players: room.players,
+        updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+      } as Room)
+    })
+    return room
+  }
+
+  /******************************
+   * 部屋を閉じる
+   * @param {string} roomId
+   */
+  async function close(roomId: string): Promise<void> {
     // parameter check
     const doc = await ctx.app.$fireStore.collection('rooms').doc(roomId).get()
     if (!doc.exists) return
 
-    const room = _dataToRoom(doc.data())
-    // add user payload
-    const user = {
-      id: ctx.app.$accessor.auth.user.id,
-      playerName: ctx.app.$accessor.auth.user.playerName,
-      status: 'online',
-    } as RoomUser
-
-    // join user
+    const room = dataToRoom(doc.data()!)
+    // close room
     await ctx.app.$fireStore
       .collection('rooms')
       .doc(room.id)
       .update({
-        users: ctx.app.$fireStoreObj.FieldValue.arrayUnion(user),
+        status: 'close' as RoomStatus,
         updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
       })
+    // set current room
+    state.currentRoom = {} as Room
   }
 
   let _roomConnection: () => void | undefined
@@ -160,14 +255,16 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    * 部屋情報をアタッチする
    * @param {string} roomId
    */
-  const attachRoom = (roomId: string): void => {
+  function attachRoom(roomId: string): void {
+    // detachRoom()
+
     _roomConnection = ctx.app.$fireStore
-      .collection('rooms')
+      .collection('rooms' as CollectionName)
       .doc(roomId)
       .onSnapshot((doc) => {
         const data = doc.data()
         if (doc.exists && data !== undefined) {
-          state.currentRoom = _dataToRoom(data)
+          state.currentRoom = dataToRoom(data)
         }
       })
   }
@@ -185,6 +282,8 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    * @param {string} roomId
    */
   function attachList(): void {
+    // detachList()
+
     // 待機ステータスの部屋一覧
     _waitRoomListConnection = ctx.app.$fireStore
       .collection('rooms' as CollectionName)
@@ -213,24 +312,20 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
   const _setRoomList = (change: firebase.firestore.DocumentChange): void => {
     const data = change.doc.data() as Room
-    const romm = _dataToRoom(data)
+    const romm = dataToRoom(data)
+    const idx = state.list.findIndex((e) => e.id === romm.id)
     switch (change.type) {
       case 'added':
-        if (state.list.findIndex((e) => e.id === romm.id) === -1)
-          state.list.push(romm)
+        if (idx !== -1) break
+        state.list.push(romm)
         break
       case 'modified':
-        state.list.splice(
-          state.list.findIndex((e) => e.id === romm.id),
-          1,
-          romm
-        )
+        if (idx === -1) break
+        state.list.splice(idx, 1, romm)
         break
       case 'removed':
-        state.list.splice(
-          state.list.findIndex((e) => e.id === romm.id),
-          1
-        )
+        if (idx === -1) break
+        state.list.splice(idx, 1)
         break
     }
     state.list.sort((a, b) => {
@@ -246,14 +341,19 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    * Injection
    */
   inject('room', {
-    get() {
+    get info() {
       return state.currentRoom
+    },
+    set info(arg: Room) {
+      state.currentRoom = arg
     },
     get list(): Room[] {
       return state.list
     },
     create,
     join,
+    exit,
+    close,
     attachRoom,
     detachRoom,
     attachList,

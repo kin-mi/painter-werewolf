@@ -1,11 +1,27 @@
 <template>
   <div id="content">
     <transition name="page">
-      <nuxt class="flex-1" />
+      <nuxt class="flex-grow flex-1" />
+    </transition>
+    <transition name="bottom">
+      <Messenger v-if="isMessangerOpen" />
     </transition>
   </div>
 </template>
-
+<script lang="ts">
+import Vue from 'vue'
+import Messenger from '~/components/Messenger.vue'
+export default Vue.extend({
+  components: {
+    Messenger,
+  },
+  computed: {
+    isMessangerOpen() {
+      return !!Object.keys(this.$room.info).length && this.$room.info.chat
+    },
+  },
+})
+</script>
 <style>
 html {
   font-family: 'Noto Sans JP', 'Source Sans Pro', -apple-system,
@@ -31,18 +47,27 @@ html {
 }
 
 #content {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  @apply bg-base;
+  @apply min-h-screen flex flex-col bg-base;
 }
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 1s;
+  will-change: opacity;
+  transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 .page-enter,
 .page-leave-active {
   opacity: 0;
+}
+
+.bottom-enter-active,
+.bottom-leave-active {
+  transform: translate(0px, 0px);
+  transition: transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+}
+
+.bottom-enter,
+.bottom-leave-to {
+  transform: translateY(100vh) translateY(0px);
 }
 </style>

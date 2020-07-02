@@ -41,7 +41,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    login() {
+    async login() {
       const user = this.$fireAuth.currentUser
       if (user && this.displayName) {
         user.updateProfile({
@@ -49,7 +49,7 @@ export default Vue.extend({
         })
         this.setUser(user)
       } else {
-        this.$fireAuth
+        await this.$fireAuth
           .signInAnonymously()
           .then((result) => {
             if (result?.user !== null) {

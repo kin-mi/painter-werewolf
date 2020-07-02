@@ -15,7 +15,7 @@ export default Vue.extend({
   },
   methods: {
     goLobi(): void {
-      this.$router.push('lobi')
+      this.$router.push('lobby')
     },
   },
 })

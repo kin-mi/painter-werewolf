@@ -40,7 +40,12 @@ const config: Configuration = {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: ['~/plugins/messenger', '~/plugins/room'],
+  plugins: [
+    '~/plugins/messenger',
+    '~/plugins/room',
+    '~/plugins/gameManager',
+    '~/plugins/canvas',
+  ],
   /*
    ** Nuxt.js dev-modules
    */
@@ -68,6 +73,7 @@ const config: Configuration = {
     '@nuxtjs/axios',
     // Doc: https://firebase.nuxtjs.org/guide/introduction/
     '@nuxtjs/firebase',
+    '@nuxtjs/dayjs',
   ],
   /*
    ** Axios module configuration

@@ -6,7 +6,7 @@
     "lib": [
       "esnext",
       "esnext.asynciterable",
-      "dom"
+      "dom",
     ],
     "esModuleInterop": true,
     "allowJs": true,
@@ -27,6 +27,7 @@
       "@types/node",
       "@nuxt/types",
       "@nuxtjs/firebase",
+      "@nuxtjs/dayjs",
       "firebase/"
     ],
     "typeRoots" : ["./src/types"]
