@@ -53,7 +53,7 @@ export default Vue.extend({
       return this.$room.info
     },
     onlineUsers(): RoomUser[] {
-      return this.room.players.filter((e) => e.status === 'online')
+      return this.room.playersStatus.filter((e) => e.status === 'online')
     },
     isOwner(): boolean {
       return (
@@ -86,11 +86,8 @@ export default Vue.extend({
       else await this.$room.exit(this.room.id)
     },
     async playStart() {
-      console.log('start start')
       await this.$gm.start(this.room.id)
-      console.log('start end')
       await this.$router.push('play')
-      console.log('goto play')
     },
   },
 })

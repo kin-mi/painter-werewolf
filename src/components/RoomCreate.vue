@@ -47,23 +47,40 @@
 
           <!--Body-->
           <form class="w-full max-w-sm flex flex-col">
-            <label for="message">
-              メッセージ
+            <label for="category">
+              お題カテゴリ
             </label>
-            <input
-              id="message"
-              v-model="roomConfig.message"
+            <select
+              id="category"
+              v-model="roomConfig.category"
               class="border-b text-right"
-              type="text"
-              min="1"
-              max="10"
-            />
+            >
+              <option
+                v-for="(category, index) in categoreis"
+                :key="`${category}${index}`"
+                >{{ category }}</option
+              >
+            </select>
+            <label for="theme">
+              お題テーマ
+            </label>
+            <select
+              id="theme"
+              v-model="roomConfig.theme"
+              class="border-b text-right"
+            >
+              <option
+                v-for="(theme, index) in themes"
+                :key="`${theme}${index}`"
+                >{{ theme }}</option
+              >
+            </select>
             <label for="turn">
               ターン数
             </label>
             <input
               id="trun"
-              v-model="roomConfig.turn"
+              v-model="roomConfig.round"
               class="border-b text-right"
               type="number"
               min="1"
@@ -98,6 +115,17 @@
               class="border-b text-right"
               type="checkbox"
             />
+            <label for="message">
+              募集メッセージ
+            </label>
+            <input
+              id="message"
+              v-model="roomConfig.message"
+              class="border-b text-right"
+              type="text"
+              min="1"
+              max="10"
+            />
           </form>
 
           <!--Footer-->
@@ -116,19 +144,37 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import { Categories, Themes, ThemeMap } from '~/utils/theme'
 
 export default Vue.extend({
   data() {
     return {
       modalActive: false,
       roomConfig: {
+        category: '色' as Categories,
+        theme: '赤いもの' as Themes<Categories>,
         message: '',
-        turn: 2,
+        round: 2,
         limitPlayers: 5,
         watch: true,
         chat: true,
       },
     }
+  },
+  computed: {
+    categoreis(): string[] {
+      return Object.keys(ThemeMap)
+    },
+    themes(): Themes<Categories>[] {
+      return (ThemeMap as ThemeMap)[this.roomConfig.category].map(
+        (e) => e.theme as Themes<Categories>
+      )
+    },
+  },
+  watch: {
+    'roomConfig.category'(n, o) {
+      if (n !== o) this.roomConfig.theme = this.themes[0]
+    },
   },
   mounted() {
     this.$room.attachList()

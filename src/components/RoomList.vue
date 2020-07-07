@@ -5,6 +5,7 @@
       <thead>
         <tr>
           <th class="px-2 py-1">メッセージ</th>
+          <th class="px-2 py-1">テーマ</th>
           <th class="px-2 py-1">ターン数</th>
           <th class="px-2 py-1">最大人数</th>
           <th class="px-2 py-1">観戦許可</th>
@@ -20,12 +21,13 @@
           <td class="px-2 py-1">
             {{ room.message }}
           </td>
-          <td class="px-2 py-1">{{ room.turn }}</td>
+          <td class="px-2 py-1">{{ room.theme }}</td>
+          <td class="px-2 py-1">{{ room.round }}</td>
           <td class="px-2 py-1">{{ room.limitPlayers }}</td>
           <td class="px-2 py-1">{{ room.watch ? '○' : '×' }}</td>
           <td class="px-2 py-1">{{ room.chat ? '○' : '×' }}</td>
           <td class="px-2 py-1">
-            {{ filterOnlineUsers(room.players)[0].playerName }}
+            {{ filterOnlineUsers(room.playersStatus)[0].playerName }}
           </td>
           <td class="px-2 py-1">
             {{ room.status === 'wait' ? '待機中' : '対戦中' }}
@@ -46,7 +48,8 @@
               class="hover:opacity-75 btn-primary"
               type="button"
               :disabled="
-                filterOnlineUsers(room.players).length >= room.limitPlayers
+                filterOnlineUsers(room.playersStatus).length >=
+                room.limitPlayers
               "
               @click="join(room.id)"
             >
@@ -57,7 +60,7 @@
       </tbody>
       <tbody v-else>
         <tr>
-          <td class="px-2 py-1 cols text-center" colspan="9">
+          <td class="px-2 py-1 cols text-center" colspan="10">
             <p>部屋はありません</p>
           </td>
         </tr>

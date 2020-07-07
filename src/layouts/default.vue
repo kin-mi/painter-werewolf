@@ -4,7 +4,7 @@
       <nuxt class="flex-grow flex-1" />
     </transition>
     <transition name="bottom">
-      <Messenger v-if="isMessangerOpen" />
+      <Messenger v-if="isMessengerOpen" />
     </transition>
   </div>
 </template>
@@ -16,8 +16,8 @@ export default Vue.extend({
     Messenger,
   },
   computed: {
-    isMessangerOpen() {
-      return !!Object.keys(this.$room.info).length && this.$room.info.chat
+    isMessengerOpen() {
+      return !!Object.keys(this.$room.info).length
     },
   },
 })

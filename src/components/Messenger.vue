@@ -2,38 +2,16 @@
   <div class="fixed bottom-0 w-full">
     <div
       ref="messageWrapper"
-      class="max-w-md max-h-screen-1/5 h-auto mt-2 mx-auto bg-gray-200 border border-green-800 rounded-md shadow overflow-x-scroll overflow-y-scroll"
+      class="overflow-auto max-w-md h-screen-1/5 mt-2 mx-auto bg-gray-200 border border-green-800 rounded-md shadow"
     >
-      <div class="w-full flex text-left text-xs">
-        <div class="w-full h-auto flex flex-col">
-          <div class="px-2 py-2 flex-1">
-            <!-- message template -->
-            <template v-for="(message, index) in messageList">
-              <div :key="index" class="flex items-start mb-4">
-                <img
-                  src="https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"
-                  class="w-10 h-10 rounded-full mr-3"
-                />
-                <div class="flex flex-col">
-                  <div class="flex items-end">
-                    <span class="font-bold text-md mr-2 font-sans">{{
-                      message.playerName
-                    }}</span>
-                    <span class="text-grey text-xs font-light">{{
-                      $dayjs(message.createAt).format('HH:MM')
-                    }}</span>
-                  </div>
-                  <p
-                    class="w-full font-light text-md text-gray-800 pt-1 break-words"
-                  >
-                    {{ message.body }}
-                  </p>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
+      <!-- <transition-group name="chat" tag="div" class="flex flex-col justify-end">
+        <template v-for="(message, index) in messageList">
+          <MessengerCard :key="index" :message="message" />
+        </template>
+      </transition-group> -->
+      <template v-for="(message, index) in messageList">
+        <MessengerCard :key="index" :message="message" />
+      </template>
     </div>
     <div
       class="max-w-md flex mt-1 my-4 mb-1 rounded-lg border-2 border-green-800 overflow-hidden mx-auto"
@@ -55,7 +33,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Message } from '~/plugins/messenger'
+import MessengerCard from '~/components/MessengerCard.vue'
+
 export default Vue.extend({
+  components: {
+    MessengerCard,
+  },
   data() {
     return {
       messageBody: '',
@@ -99,3 +82,15 @@ export default Vue.extend({
   },
 })
 </script>
+<style scoped>
+.chat-move {
+  transition: all 0.8s ease;
+}
+.chat-enter {
+  transform: translateY(50px);
+  opacity: 0;
+}
+.chat-enter-active {
+  transition: all 0.8s ease;
+}
+</style>

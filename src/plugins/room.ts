@@ -6,15 +6,16 @@ import {
   RoomStatus,
   UserStatus,
   CollectionName,
-  userColors,
   UserColors,
 } from '~/utils/constant'
+import { Categories, Themes } from '~/utils/theme'
 
 type InjectTypeRoom = {
   info: Room
   list: Room[]
   create(options: CreateParams): Promise<void>
   join(roomId: string): Promise<void>
+  reJoin(uid: string): Promise<void>
   watch(roomId: string): Promise<void>
   exit(roomId: string): Promise<void>
   close(roomId: string): Promise<void>
@@ -47,20 +48,23 @@ export type RoomUser = {
 export type Room = {
   id: string
   status: RoomStatus
-  players: RoomUser[]
+  players: string[]
+  playersStatus: RoomUser[]
   watchers: RoomUser[]
   createAt?: Date | firestore.Timestamp
   updateAt?: Date | firestore.Timestamp
   // ↓Parameters
+  category: Categories
+  theme: Themes<Categories>
   message: string
-  turn: number
+  round: number
   limitPlayers: number
   watch: boolean
   chat: boolean
 }
 type CreateParams = Pick<
   Room,
-  'message' | 'turn' | 'limitPlayers' | 'watch' | 'chat'
+  'category' | 'theme' | 'message' | 'round' | 'limitPlayers' | 'watch' | 'chat'
 >
 
 // Firestore Document Data to Room Object
@@ -106,12 +110,13 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     // room payload
     const room = {
       id: `${ctx.$dayjs().format('YYYYMMDDHHmmss')}${uuid().replace(/-/g, '')}`,
-      players: [
+      players: [user.id],
+      playersStatus: [
         {
           id: user.id,
           playerName: user.playerName,
           status: 'online',
-          color: userColors.black,
+          color: UserColors.black,
         } as RoomUser,
       ],
       watchers: [],
@@ -156,18 +161,29 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
   // 次の色を探す
   function _findNextColor(room: Room): UserColors {
-    const alreadyExistsColors = room.players
+    const alreadyExistsColors = room.playersStatus
       .filter((e) => e.status === 'online')
       .map((e) => e.color)
-    console.log(alreadyExistsColors)
-    console.log(Object.values(userColors))
-    console.log(
-      Object.values(userColors).find((e) => !alreadyExistsColors.includes(e))
-    )
     return (
-      Object.values(userColors).find((e) => !alreadyExistsColors.includes(e)) ||
-      userColors.black
+      Object.values(UserColors).find((e) => !alreadyExistsColors.includes(e)) ||
+      UserColors.black
     )
+  }
+
+  /******************************
+   * 再度入室する時の処理
+   * @param {string} uid
+   */
+  async function reJoin(uid: string): Promise<void> {
+    const roomCollectionRef = ctx.app.$fireStore
+      .collection('rooms' as CollectionName)
+      .where('players', 'array-contains', uid)
+      .where('status', '==', 'play' as RoomStatus)
+      .limit(1)
+    const roomSnap = await roomCollectionRef.get()
+    if (roomSnap.empty) throw new Error('Not joined.')
+    const room = dataToRoom(roomSnap.docs[0].data())
+    state.currentRoom = room
   }
 
   /******************************
@@ -177,7 +193,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   async function exit(roomId: string): Promise<void> {
     const user = ctx.app.$accessor.auth.user
     const joinedUser =
-      state.currentRoom.players.find(
+      state.currentRoom.playersStatus.find(
         (e) => e.id === user.id && e.status === 'online'
       ) ||
       state.currentRoom.watchers.find(
@@ -210,18 +226,24 @@ const RoomPlugin: Plugin = (ctx, inject) => {
       const roomSnap = await trn.get(roomDocRef)
       if (!roomSnap.exists) throw new Error(`Not found room. ${roomDocRef.id}`)
       room = dataToRoom(roomSnap.data()!)
-      console.log('user', user)
-      console.log('room.players', room.players)
-      const targetUserIdx = room.players.findIndex(
+
+      const targetUserIdx = room.playersStatus.findIndex(
         (e) => e.id === user.id && e.status === 'online'
       )
       if (targetUserIdx !== -1) {
-        room.players.splice(targetUserIdx, 1, user)
+        // 対象のユーザーが存在する場合、更新
+        room.playersStatus.splice(targetUserIdx, 1, user)
+        // 退出の場合、参加者リストからも削除
+        if (user.status === 'exit')
+          room.players = room.players.filter((e) => e !== user.id)
       } else {
-        room.players.push(user)
+        // 存在しない場合、追加
+        room.playersStatus.push(user)
+        room.players.push(user.id)
       }
       trn.update(roomDocRef, {
         players: room.players,
+        playersStatus: room.playersStatus,
         updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
       } as Room)
     })
@@ -352,6 +374,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     },
     create,
     join,
+    reJoin,
     exit,
     close,
     attachRoom,

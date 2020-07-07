@@ -5,11 +5,19 @@ import { firestore } from 'firebase'
 import { RoomUser, dataToRoom } from './room'
 import { CollectionName } from '~/utils/constant'
 import { shuffle } from '~/utils/array'
+import { ThemeMap } from '~/utils/theme'
+import { SystemMessage } from '~/utils/message'
 
 type InjectTypeGM = {
   playground: Playground
+  isMyTurn: boolean
+  isRoundFinished: boolean
+  isGameFinished: boolean
   start(roomId: string): Promise<void>
   init(roomId: string): Promise<void>
+  next(roomId: string): Promise<void>
+  acceptVote(roomId: string, voteResult: string): Promise<void>
+  close(roomId: string): Promise<void>
   attachPlayground(roomId: string, playId: string): void
   detachPlayground(): void
   attachLineList(roomId: string, playId: string): void
@@ -29,11 +37,27 @@ declare module 'vue/types/vue' {
     $gm: InjectTypeGM
   }
 }
-type PlayUser = RoomUser & { order: number }
+export type CurrentTurn = {
+  round: number
+  turn: number
+  painter?: string
+}
+export type Vote = {
+  id: string
+  voteResult: string
+  voteDate: Date
+}
+export type PlayUser = RoomUser & { order: number }
 export type Playground = {
   id: string
   players: PlayUser[]
   watchers: RoomUser[]
+  round: number
+  currentTurn: CurrentTurn
+  werewolf: string
+  answer: string
+  votes: Vote[]
+  result: 'painter' | 'werewolf' | ''
   createAt?: Date | firestore.Timestamp
   updateAt?: Date | firestore.Timestamp
 }
@@ -51,9 +75,11 @@ export const dataToPlayground = (data: firestore.DocumentData): Playground => {
         : undefined,
   } as Playground
 }
-
+const sleep = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms))
 type State = {
   playground: Playground | undefined
+  isRoundFinished: boolean
+  isGameFinished: boolean
 }
 
 /**********************************************
@@ -67,6 +93,8 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
    */
   const state = Vue.observable({
     playground: undefined,
+    isRoundFinished: false,
+    isGameFinished: false,
   } as State)
 
   /******************************
@@ -79,6 +107,7 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
       const roomDocRef = ctx.app.$fireStore
         .collection('rooms' as CollectionName)
         .doc(roomId)
+
       // 現在の部屋情報を取得
       const roomSnap = await trn.get(roomDocRef)
       if (!roomSnap.exists) throw new Error(`Not found room. ${roomDocRef.id}`)
@@ -89,23 +118,46 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
         updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
         createAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
       })
+
       // playground payload
-      const playground = {
+      const shufflePlayers = shuffle(room.playersStatus).map((e, i) => ({
+        ...e,
+        order: i,
+      }))
+      const ansewrs = (ThemeMap as ThemeMap)[room.category].find(
+        (e) => e.theme === room.theme
+      )?.answer
+      const answer = ansewrs![Math.floor(Math.random() * ansewrs!.length)]
+
+      const playground: Playground = {
         id: `${ctx.$dayjs().format('YYYYMMDDHHmmss')}${uuid().replace(
           /-/g,
           ''
         )}`,
-        players: shuffle(room.players).map((e, i) => ({ ...e, order: i })),
+        players: shufflePlayers,
         watchers: room.watchers,
-      } as Playground
-      const playgroundRef = roomDocRef
+        round: room.round,
+        currentTurn: {
+          round: 1,
+          turn: 1,
+          painter: shufflePlayers[0].id,
+        },
+        werewolf:
+          room.playersStatus[
+            Math.floor(Math.random() * room.playersStatus.length)
+          ].id,
+        answer,
+        votes: [],
+        result: '',
+      }
+      const playgroundDocRef = roomDocRef
         .collection('playground' as CollectionName)
         .doc(playground.id)
-      trn.set(playgroundRef, {
+      return trn.set(playgroundDocRef, {
         ...playground,
         updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
         createAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
-      })
+      } as Playground)
     })
   }
 
@@ -119,14 +171,219 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
       .doc(roomId)
       .collection('playground' as CollectionName)
       .limit(1)
-    await playgroundCollectionRef.get().then((snap) => {
+    await playgroundCollectionRef.get().then(async (snap) => {
       if (snap.empty) return
-      snap.forEach((doc) => {
-        const data = doc.data()
-        state.playground = dataToPlayground(data)
+      const playground = dataToPlayground(snap.docs[0].data())
+      state.playground = playground
+      await _initMessage(roomId, playground)
+    })
+  }
+  // 初期メッセージ
+  async function _initMessage(
+    roomId: string,
+    playground: Playground
+  ): Promise<void> {
+    ctx.$messages.pushSystemMessage(
+      { body: SystemMessage.INFO_FOR_A_GAME_START, roomId },
+      'all'
+    )
+    await sleep()
+    ctx.$messages.pushSystemMessage(
+      { body: SystemMessage.INFO_FOR_P_YOUR_PAINTER, roomId },
+      'paiter'
+    )
+    ctx.$messages.pushSystemMessage(
+      { body: SystemMessage.INFO_FOR_W_YOUR_WEREWOLF, roomId },
+      'werewolf'
+    )
+    await sleep()
+    ctx.$messages.pushSystemMessage(
+      {
+        body: SystemMessage.INFO_FOR_P_ANSWER(playground.answer),
+        roomId,
+      },
+      'paiter'
+    )
+    // 自身が最初のユーザーの場合、アナウンス
+    if (playground.players[0].id === ctx.app.$accessor.auth.user.id) {
+      await sleep()
+      ctx.$messages.pushSystemMessage(
+        {
+          body: SystemMessage.INFO_FOR_A_YOUR_TURN,
+          roomId,
+        },
+        'all'
+      )
+    }
+  }
+
+  /******************************
+   * 次のターンへ進める
+   * @param {string} roomId
+   */
+  async function next(roomId: string): Promise<void> {
+    // Start transaction.
+    await ctx.app.$fireStore.runTransaction(async (trn) => {
+      const playgroundDocRef = ctx.app.$fireStore
+        .collection('rooms' as CollectionName)
+        .doc(roomId)
+        .collection('playground' as CollectionName)
+        .doc(state.playground?.id)
+      const playgroundSnap = await trn.get(playgroundDocRef)
+      if (!playgroundSnap.exists) return
+      const playground = dataToPlayground(playgroundSnap.data()!)
+
+      // 現在の順番を取得
+      const currentPlayerIdx = playground.players.findIndex(
+        (e) => e.id === playground.currentTurn.painter
+      )
+      if (playground.players[currentPlayerIdx + 1]) {
+        // 次のユーザーへ切り替え
+        playground.currentTurn.painter =
+          playground.players[currentPlayerIdx + 1].id
+        playground.currentTurn.turn++
+      } else if (playground.currentTurn.round === playground.round) {
+        // ラウンド終了
+        playground.currentTurn.painter = ''
+      } else {
+        // ラウンドを進めて先頭のユーザーへ切り替え
+        playground.currentTurn.painter = playground.players[0].id
+        playground.currentTurn.turn++
+        playground.currentTurn.round = playground.currentTurn.round + 1
+      }
+      state.playground = playground
+      return trn.set(playgroundDocRef, {
+        ...playground,
+        updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
       })
     })
   }
+
+  /******************************
+   * 投票システム
+   * @param {string} roomId
+   * @param {string} voteResult
+   */
+  async function acceptVote(roomId: string, voteResult: string): Promise<void> {
+    // Start transaction.
+    await ctx.app.$fireStore.runTransaction(async (trn) => {
+      const playgroundDocRef = ctx.app.$fireStore
+        .collection('rooms' as CollectionName)
+        .doc(roomId)
+        .collection('playground' as CollectionName)
+        .doc(state.playground?.id)
+      const playgroundSnap = await trn.get(playgroundDocRef)
+      if (!playgroundSnap.exists) return
+      const playground = dataToPlayground(playgroundSnap.data()!)
+      // 投票済の場合
+      const findIdx = playground.votes.findIndex(
+        (e) => e.id === ctx.app.$accessor.auth.user.id
+      )
+      if (findIdx !== -1) return
+
+      // vote payload
+      const vote: Vote = {
+        id: ctx.app.$accessor.auth.user.id,
+        voteResult,
+        voteDate: ctx.$dayjs().toDate(),
+      }
+      // 最後の投票の場合、結果を判定する
+      if (playground.votes.length + 1 === playground.players.length) {
+        playground.result = _judgment({
+          ...playground,
+          votes: [...playground.votes, vote],
+        })
+      }
+      return trn.update(playgroundDocRef, {
+        ...playground,
+        votes: ctx.app.$fireStoreObj.FieldValue.arrayUnion(vote),
+        updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+      })
+    })
+  }
+
+  /******************************
+   * 勝敗を決定する
+   * @param {Playground} playground
+   */
+  function _judgment(playground: Playground): '' | 'painter' | 'werewolf' {
+    const groupBy = <K, V>(
+      array: readonly V[],
+      getKey: (cur: V, idx: number, src: readonly V[]) => K
+    ): [K, V[]][] =>
+      Array.from(
+        array.reduce((map, cur, idx, src) => {
+          const key = getKey(cur, idx, src)
+          const list = map.get(key)
+          if (list) list.push(cur)
+          else map.set(key, [cur])
+          return map
+        }, new Map<K, V[]>())
+      )
+    // 投票を集計
+    const sumVotes = groupBy(playground.votes, (v) => v.voteResult)
+    // 投票数の最大値
+    const maxVoteCount = sumVotes
+      .map((v) => v[1].length)
+      .sort((a, b) => b - a)[0]
+    // 一番投票された人（複数有り）
+    const topMembers = sumVotes
+      .filter((v) => v[1].length === maxVoteCount)
+      .map((v) => v[0])
+    // 人狼の答え
+    const werewolfAnswer = playground.votes.find(
+      (e) => e.id === state.playground!.werewolf
+    )?.voteResult
+    // 上記に人狼が含まれる場合、画家陣営の勝ち
+    const result = topMembers.includes(state.playground!.werewolf)
+      ? state.playground?.answer === werewolfAnswer
+        ? 'werewolf'
+        : 'painter'
+      : 'werewolf'
+    return result
+  }
+
+  /******************************
+   * クローズ処理
+   * @param {string} roomId
+   */
+  async function close(roomId: string): Promise<void> {
+    // 結果メッセージの出力
+    if (state.playground?.result !== '') {
+      ctx.$messages.pushSystemMessage(
+        { body: SystemMessage.INFO_FOR_A_ALL_VOTED, roomId },
+        'all'
+      )
+      setTimeout(() => {}, 1000)
+      state.playground?.result === 'painter'
+        ? ctx.$messages.pushSystemMessage(
+            { body: SystemMessage.INFO_FOR_A_WIN_PAINTER, roomId },
+            'all'
+          )
+        : ctx.$messages.pushSystemMessage(
+            { body: SystemMessage.INFO_FOR_A_WIN_WEREWOLF, roomId },
+            'all'
+          )
+    }
+    // 部屋をクローズする
+    if (ctx.$room.info.status !== 'close') {
+      // Start transaction.
+      await ctx.app.$fireStore.runTransaction(async (trn) => {
+        const roomDocRef = ctx.app.$fireStore
+          .collection('rooms' as CollectionName)
+          .doc(roomId)
+        const roomSnap = await trn.get(roomDocRef)
+        if (!roomSnap.exists) return
+        const room = dataToRoom(roomSnap.data()!)
+        if (room.status === 'close') return
+        trn.update(roomDocRef, {
+          status: 'close',
+          updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+        })
+      })
+    }
+  }
+
   let _playgroundConnection: () => void | undefined
   /******************************
    * ゲーム情報をアタッチする
@@ -171,9 +428,9 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
       .collection('lines' as CollectionName)
       .orderBy('createAt')
       .onSnapshot((snap) => {
-        snap.docChanges().forEach((change) => {
+        snap.docChanges().forEach(async (change) => {
           if (change.type === 'added') {
-            ctx.$canvas.loadLine(change.doc.data()!.line)
+            await ctx.$canvas.loadLine(change.doc.data())
           }
         })
       })
@@ -189,8 +446,31 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
     get playground() {
       return state.playground
     },
+    get isMyTurn(): boolean {
+      if (!state.playground || state.playground.currentTurn?.painter === '')
+        return false
+      return (
+        state.playground!.currentTurn?.painter ===
+        ctx.app.$accessor.auth.user.id
+      )
+    },
+    get isRoundFinished(): boolean {
+      return state.isRoundFinished
+    },
+    set isRoundFinished(flag: boolean) {
+      state.isRoundFinished = flag
+    },
+    get isGameFinished(): boolean {
+      return state.isGameFinished
+    },
+    set isGameFinished(flag: boolean) {
+      state.isGameFinished = flag
+    },
     start,
     init,
+    next,
+    acceptVote,
+    close,
     attachPlayground,
     detachPlayground,
     attachLineList,

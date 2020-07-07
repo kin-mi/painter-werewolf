@@ -41,10 +41,41 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    // getOlder({ getters, commit }): boolean {
-    //   const currentAge = getters.age
-    //   commit('setAge', currentAge + 1)
-    //   return true
-    // },
+    async asyncAuth({ getters, commit }): Promise<string> {
+      // 認証状態の監視 （待機 最大1秒）
+      const waitReady = (nowSec: number): Promise<string> => {
+        if (nowSec > 1000) {
+          // time over
+          throw new Error('Time over.')
+        }
+        setTimeout(() => {}, 50)
+        if (getters.isReady) {
+          if (getters.user.id && !getters.user.playerName) {
+            commit('SET_USER', {
+              id: getters.user.id,
+              displayName: getters.user.displayName || '',
+              playerName: getters.user.displayName,
+            })
+            // already logged in
+            return new Promise<string>((resolve) =>
+              resolve('already logged in')
+            )
+          } else if (getters.user.playerName) {
+            // from Login page
+            return new Promise<string>((resolve) =>
+              resolve('already logged in')
+            )
+          } else {
+            // not logged in
+            throw new Error('not logged in')
+          }
+        }
+        // not ready
+        return waitReady(nowSec + 50)
+      }
+      const result = await waitReady(0)
+      console.log('[async auth]', result)
+      return result
+    },
   }
 )

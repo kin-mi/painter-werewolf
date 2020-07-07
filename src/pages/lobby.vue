@@ -20,7 +20,6 @@ import Vue from 'vue'
 import RoomCreate from '~/components/RoomCreate.vue'
 import RoomList from '~/components/RoomList.vue'
 import Room from '~/components/Room.vue'
-import { User } from '~/store/auth'
 
 export default Vue.extend({
   components: {
@@ -28,35 +27,15 @@ export default Vue.extend({
     RoomList,
     Room,
   },
-  validate({ app }) {
-    // 認証状態の監視 （待機 最大1秒）
-    const waitReady = (nowSec: number): boolean => {
-      if (nowSec > 1000) {
-        // time over
+  async validate({ app }) {
+    return await app.$accessor.auth
+      .asyncAuth()
+      .then(() => {
+        return true
+      })
+      .catch(() => {
         return false
-      }
-      setTimeout(() => {}, 50)
-      if (app.$accessor.auth.isReady) {
-        if (app.$accessor.auth.user.id && !app.$accessor.auth.user.playerName) {
-          app.$accessor.auth.SET_USER({
-            id: app.$accessor.auth.user.id,
-            displayName: app.$accessor.auth.user.displayName || '',
-            playerName: app.$accessor.auth.user.displayName,
-          } as User)
-          // already logged in
-          return true
-        } else if (app.$accessor.auth.user.playerName) {
-          // from Login page
-          return true
-        } else {
-          // not logged in
-          return false
-        }
-      }
-      // not ready
-      return waitReady(nowSec + 50)
-    }
-    return waitReady(0)
+      })
   },
   computed: {
     isJoined(): boolean {

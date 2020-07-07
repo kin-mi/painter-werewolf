@@ -1,4 +1,4 @@
-export function shuffle(array: any[]) {
+export function shuffle<T>(array: T[]): T[] {
   let currentIndex: number = array.length
   let temporaryValue
   let randomIndex

@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import { Plugin } from '@nuxt/types'
 import Konva from 'konva'
+import { firestore } from 'firebase'
 import { DrawStatus, CollectionName } from '~/utils/constant'
 
 type InjectTypeCanvas = {
   drawStatus: DrawStatus
+  loadedTurn: number
   mount(container: HTMLDivElement, color: string): void
   postLine(roomId: string, playId: string): Promise<void>
-  loadLine(jsonStringify: string): void
+  loadLine(data: firestore.DocumentData): Promise<void>
 }
 
 declare module '@nuxt/types' {
@@ -22,10 +24,6 @@ declare module 'vue/types/vue' {
   interface Vue {
     $canvas: InjectTypeCanvas
   }
-}
-
-type State = {
-  drawStatus: DrawStatus
 }
 
 /**
@@ -71,6 +69,11 @@ let _bgImage: Konva.Image | undefined
 let _lastLine: Konva.Line | undefined
 let _isDrawing: boolean = false
 
+type State = {
+  drawStatus: DrawStatus
+  loadedTurn: number
+}
+
 class Layer extends Konva.Layer {}
 /**********************************************
  * ゲーム用Canvasプラグイン
@@ -83,6 +86,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
    */
   const state = Vue.observable({
     drawStatus: 'stop',
+    loadedTurn: 0,
   } as State)
 
   /******************************
@@ -116,7 +120,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
   }
 
   function _mousedown() {
-    if (!_stage || !_layer || state.drawStatus !== 'start') return
+    if (!_stage || !_layer || _isDrawing || state.drawStatus !== 'start') return
     removeScrollEvent()
     _isDrawing = true
     // 新規ラインの追加
@@ -129,6 +133,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
   }
 
   function _mouseup() {
+    if (!_isDrawing || !_lastLine) return
     undoScrollEvent()
     _isDrawing = false
     state.drawStatus = 'finish'
@@ -136,7 +141,6 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
 
   function _mousemove() {
     if (!_stage || !_layer || !_isDrawing || !_lastLine) return
-
     const pos = _stage.getPointerPosition()
     const scale = _stage.getAbsoluteScale()
     const newPoints = _lastLine
@@ -164,6 +168,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     // line payload
     const user = ctx.app.$accessor.auth.user
     const line = {
+      id: user.id,
       player: user.playerName,
       line: _lastLine.toJSON(),
       createAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
@@ -173,24 +178,31 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
 
   /******************************
    * lineをキャンバスへ描画する
-   * @param {string} jsonStringify
+   * @param {string} docId
+   * @param {firestore.DocumentData} data
    */
-  function loadLine(jsonStringify: string): void {
+  async function loadLine(data: firestore.DocumentData): Promise<void> {
     if (!_layer) return
-    const reciveData = JSON.parse(jsonStringify).attrs as Konva.LineConfig
-    const startPoint = [reciveData.points.shift()!, reciveData.points.shift()!]
-    const stackPoint = reciveData.points
-    const line = new Konva.Line({ ...reciveData, points: startPoint })
+    const jsonStringify = data.line
+    const reciveLine = JSON.parse(jsonStringify).attrs as Konva.LineConfig
+    const startPoint = [reciveLine.points.shift()!, reciveLine.points.shift()!]
+    const stackPoint = reciveLine.points
+    const line = new Konva.Line({
+      ...reciveLine,
+      points: startPoint,
+    })
     _layer.add(line)
 
-    const drawPoints = (): void => {
+    const drawPoints = (): Promise<void> | undefined => {
       const newPoints = [stackPoint.shift()!, stackPoint.shift()!]
-      if (newPoints[0] === undefined || newPoints[1] === undefined) return
+      if (newPoints[0] === undefined || newPoints[1] === undefined)
+        return Promise.resolve()
       line.points(line.points().concat(newPoints))
       _layer!.batchDraw()
       setTimeout(drawPoints, 5)
     }
-    setTimeout(drawPoints, 5)
+    await setTimeout(drawPoints, 5)
+    state.loadedTurn++
   }
 
   inject('canvas', {
@@ -199,6 +211,9 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     },
     set drawStatus(value: DrawStatus) {
       state.drawStatus = value
+    },
+    get loadedTurn() {
+      return state.loadedTurn
     },
     mount,
     postLine,

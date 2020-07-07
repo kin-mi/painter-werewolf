@@ -1,14 +1,14 @@
 /**
  * Firestore Collection name
  */
-const collectionName = ['rooms', 'messages', 'playground', 'lines'] as const
-export type CollectionName = typeof collectionName[number]
+const CollectionName = ['rooms', 'messages', 'playground', 'lines'] as const
+export type CollectionName = typeof CollectionName[number]
 
 /**
  * 部屋のステータス
  */
-const roomStatus = ['wait', 'play', 'close'] as const
-export type RoomStatus = typeof roomStatus[number]
+const RoomStatus = ['wait', 'play', 'close'] as const
+export type RoomStatus = typeof RoomStatus[number]
 
 /**
  * ユーザーステータス
@@ -19,7 +19,7 @@ export type UserStatus = typeof userStatus[number]
 /**
  * ユーザーに設定する色
  */
-export const userColors = {
+export const UserColors = {
   black: '#1A202C',
   red: '#E53E3E',
   yellow: '#D69E2E',
@@ -31,7 +31,7 @@ export const userColors = {
   teal: '#319795',
   indigo: '#5A67D8',
 } as const
-export type UserColors = typeof userColors[keyof typeof userColors]
+export type UserColors = typeof UserColors[keyof typeof UserColors]
 
 /**
  * キャンバス描画ステータス

@@ -5,8 +5,11 @@ import { CollectionName } from '~/utils/constant'
 type InjectTypeMessenger = {
   list: Message[]
   push(params: MessageParams): void
+  pushSystemMessage(params: MessageParams, target: MessageFor): void
   attachMessageList(roomId: string): void
   detachMessageList(): void
+  attachJobMessageList(roomId: string, job: 'painter' | 'werewolf'): void
+  detachJobMessageList(): void
 }
 
 declare module '@nuxt/types' {
@@ -23,10 +26,13 @@ declare module 'vue/types/vue' {
   }
 }
 
+export type MessageFor = 'all' | 'paiter' | 'werewolf'
 export type Message = {
   id: string
   playerName: string
+  color: string
   body: string
+  target: MessageFor
   createAt: Date
 }
 type MessageParams = Pick<Message, 'body'> & {
@@ -89,13 +95,42 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
     const msg = {
       id: ctx.app.$accessor.auth.user.id,
       playerName: ctx.app.$accessor.auth.user.playerName,
+      color:
+        ctx.$room.info.playersStatus.find((e) => {
+          return e.id === ctx.app.$accessor.auth.user.id
+        })?.color || '#000',
       body: params.body,
+      target: 'all',
     } as Message
     // post message
     await roomDocRef.collection('messages' as CollectionName).add({
       ...msg,
       createAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
     })
+  }
+
+  /******************************
+   * システムメッセージを追加する
+   * @param {MessageParams} params
+   * @param {MessageFor} for
+   */
+  function pushSystemMessage(params: MessageParams, target: MessageFor): void {
+    const isWerewolf =
+      ctx.app.$accessor.auth.user.id === ctx.$gm.playground?.werewolf
+    console.log('pushSystemMessage', { params, isWerewolf, target })
+    if (target === 'paiter' && isWerewolf) return
+    if (target === 'werewolf' && !isWerewolf) return
+    // message payload
+    const msg = {
+      id: 'SYSTEM',
+      playerName: 'ゲームマスター',
+      color: '#674129',
+      body: params.body,
+      target,
+      createAt: ctx.$dayjs().toDate(),
+    } as Message
+    // post message
+    state.messages.push(msg)
   }
 
   let _messageListConnection: () => void | undefined
@@ -111,6 +146,7 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
 
     _messageListConnection = roomDocRef
       .collection('messages' as CollectionName)
+      .where('target', '==', 'all')
       .orderBy('createAt')
       .onSnapshot({ includeMetadataChanges: true }, (snap) => {
         snap.docChanges().forEach((change) => {
@@ -141,13 +177,62 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
     }
   }
 
+  let _jobMessageListConnection: () => void | undefined
+  /******************************
+   * 役職毎のメッセージリストをアタッチする
+   * @param {string} roomId
+   * @param {'painter' | 'werewolf'} job
+   */
+  function attachJobMessageList(
+    roomId: string,
+    job: 'painter' | 'werewolf'
+  ): void {
+    // detachMessageList()
+    const roomDocRef = ctx.app.$fireStore
+      .collection('rooms' as CollectionName)
+      .doc(roomId)
+
+    _jobMessageListConnection = roomDocRef
+      .collection('messages' as CollectionName)
+      .where('target', '==', job)
+      .orderBy('createAt')
+      .onSnapshot({ includeMetadataChanges: true }, (snap) => {
+        snap.docChanges().forEach((change) => {
+          const data = change.doc.data()
+          const msg = _dataToMessage(data)
+          const idx = state.messages.findIndex((msg) => _isEqualMsg(msg, data))
+          switch (change.type) {
+            case 'added':
+              if (idx === -1) state.messages.push(msg)
+              break
+            case 'modified':
+              state.messages.splice(idx, 1, msg)
+              break
+            case 'removed':
+              state.messages.splice(idx, 1)
+              break
+          }
+        })
+      })
+  }
+  /******************************
+   * 役職毎のメッセージリストをデタッチする
+   */
+  function detachJobMessageList(): void {
+    if (_jobMessageListConnection) {
+      _jobMessageListConnection()
+    }
+  }
   inject('messages', {
     get list() {
       return state.messages
     },
     push,
+    pushSystemMessage,
     attachMessageList,
     detachMessageList,
+    attachJobMessageList,
+    detachJobMessageList,
   })
 }
 
