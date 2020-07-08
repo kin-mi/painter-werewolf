@@ -44,10 +44,10 @@ module.exports = {
   plugins: [],
   // Learn more on https://tailwindcss.com/docs/controlling-file-size/#removing-unused-css
   purge: [
-    'components/**/*.vue',
-    'layouts/**/*.vue',
-    'pages/**/*.vue',
-    'plugins/**/*.ts',
+    './src/components/**/*.vue',
+    './src/layouts/**/*.vue',
+    './src/pages/**/*.vue',
+    './src/plugins/**/*.ts',
     'nuxt.config.ts',
   ],
 }
