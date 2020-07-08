@@ -72,8 +72,7 @@ export default Vue.extend({
   watch: {
     canvasHandler: {
       deep: true,
-      handler(n: CanvasHandler, o: CanvasHandler) {
-        console.log(n, o)
+      handler(n: CanvasHandler, _o: CanvasHandler) {
         if (
           n.loadedTurn !== 0 &&
           n.loadedTurn === n.turn - 1 &&
@@ -116,7 +115,6 @@ export default Vue.extend({
       },
     },
     async '$canvas.drawStatus'(n: DrawStatus, o: DrawStatus) {
-      console.log('$canvas.drawStatus', n, o)
       if (n === 'stop' && o !== 'stop') {
         await Promise.all([
           this.$canvas.postLine(this.$room.info.id, this.$gm.playground!.id),
@@ -125,7 +123,6 @@ export default Vue.extend({
       }
     },
     async isGameFinished(n: boolean, o: boolean) {
-      console.log('isGameFinished', { n, o })
       if (n && !o) {
         await this.$gm.close(this.$room.info.id)
         this.$gm.isGameFinished = true

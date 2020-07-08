@@ -24,6 +24,7 @@ import Vue from 'vue'
 import LoginForm from '~/components/LoginForm.vue'
 import RuleDescription from '~/components/RuleDescription.vue'
 import Copyright from '~/components/Copyright.vue'
+import { User } from '~/store/auth'
 
 export default Vue.extend({
   components: {
@@ -37,7 +38,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    setName(value) {
+    setName(value: string) {
       this.displayName = value
     },
     async login() {

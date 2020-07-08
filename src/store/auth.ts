@@ -74,7 +74,6 @@ export const actions = actionTree(
         return waitReady(nowSec + 50)
       }
       const result = await waitReady(0)
-      console.log('[async auth]', result)
       return result
     },
   }

@@ -117,7 +117,6 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
   function pushSystemMessage(params: MessageParams, target: MessageFor): void {
     const isWerewolf =
       ctx.app.$accessor.auth.user.id === ctx.$gm.playground?.werewolf
-    console.log('pushSystemMessage', { params, isWerewolf, target })
     if (target === 'paiter' && isWerewolf) return
     if (target === 'werewolf' && !isWerewolf) return
     // message payload
