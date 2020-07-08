@@ -14,7 +14,7 @@
       @click="login"
     />
     <RuleDescription class="w-full" />
-    <LoginButton class="mt-2" @click="login" />
+    <LoginButton class="mt-3" @click="login" />
     <Copyright />
   </div>
 </template>
@@ -70,28 +70,6 @@ export default Vue.extend({
         }
         this.$router.push('lobby')
       }
-
-      // const user = this.$fireAuth.currentUser
-      // if (user && this.displayName) {
-      //   user.updateProfile({
-      //     displayName: this.displayName,
-      //   })
-      //   this.setUser(user)
-      // } else {
-      //   await this.$fireAuth
-      //     .signInAnonymously()
-      //     .then((result) => {
-      //       if (result?.user !== null) {
-      //         result.user.updateProfile({
-      //           displayName: this.displayName,
-      //         })
-      //         this.setUser(result.user)
-      //       }
-      //     })
-      //     // eslint-disable-next-line no-console
-      //     .catch((e) => console.error(e))
-      // }
-      // this.$router.push('lobby')
     },
     setUser(user: firebase.User) {
       this.$accessor.auth.SET_USER({

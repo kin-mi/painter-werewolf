@@ -78,7 +78,7 @@ export default Vue.extend({
   @apply leading-tight;
   @apply border-b-4 border-orange-500;
   @apply bg-white;
-  @apply text-center;
+  @apply text-center text-lg;
   @apply text-orange-500;
   @apply transition duration-300 ease-in-out;
   --bg-opacity: 0.6;
