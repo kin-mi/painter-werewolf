@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="mb-4">
+    <div class="mb-3">
       <input
         id="username"
         class="input"
@@ -11,6 +11,23 @@
         @input="$emit('input', $event.target.value)"
       />
     </div>
+    <div class="flex items-center justify-center flex-wrap mb-5 px-5">
+      <template v-for="(icon, index) in icons">
+        <label :key="icon" class="inline-flex items-center w-1/5">
+          <input
+            :id="`icon_${index}`"
+            v-model="selectedIcon"
+            type="radio"
+            :value="index"
+            class="appearance-none"
+          />
+          <img
+            class="h-10 w-10 rounded-full border border-gray-500 bg-paint-gray cursor-pointer"
+            :src="icon"
+          />
+        </label>
+      </template>
+    </div>
     <LoginButton
       :is-disabled="!this.$accessor.auth.ready || !displayName"
       @click="$emit('click')"
@@ -20,13 +37,22 @@
 <script lang="ts">
 import Vue from 'vue'
 import LoginButton from '~/components/LoginButton.vue'
+import { IconFileName } from '~/utils/constant'
 
 export default Vue.extend({
   components: { LoginButton },
   props: { displayName: { type: String, default: '' } },
+  data() {
+    return {
+      selectedIcon: '1',
+    }
+  },
   computed: {
     inputClass(): string[] {
       return this.displayName ? ['text-lg', 'font-bold'] : ['text-xs']
+    },
+    icons(): any[] {
+      return IconFileName.map((e) => require(`~/assets/images/${e}`))
     },
   },
 })
@@ -59,5 +85,8 @@ export default Vue.extend({
 .input:focus {
   @apply transform border-orange-700 text-orange-700;
   @apply outline-none;
+}
+input[type='radio']:checked + img {
+  @apply bg-paint-green border-paint-bule;
 }
 </style>

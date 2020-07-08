@@ -38,3 +38,18 @@ export type UserColors = typeof UserColors[keyof typeof UserColors]
  */
 export const drawStatus = ['stop', 'start', 'finish'] as const
 export type DrawStatus = typeof drawStatus[number]
+
+/**
+ * アイコンファイル名
+ */
+export const IconFileName = [
+  'icon_1.svg',
+  'icon_2.svg',
+  'icon_3.svg',
+  'icon_4.svg',
+  'icon_5.svg',
+  'icon_6.svg',
+  'icon_7.svg',
+  'icon_8.svg',
+  'icon_9.png',
+] as const

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-0 w-full pb-3">
+  <div class="fixed bottom-0 w-full h-8 pb-3 bg-base bg-opacity-75">
     <p class="text-md">
       <a href="https://twitter.com/_kinmi" target="_blank">©️ きんみ</a>
     </p>

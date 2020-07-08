@@ -42,12 +42,15 @@ module.exports = {
   },
   variants: {},
   plugins: [],
-  // Learn more on https://tailwindcss.com/docs/controlling-file-size/#removing-unused-css
-  purge: [
-    './src/components/**/*.vue',
-    './src/layouts/**/*.vue',
-    './src/pages/**/*.vue',
-    './src/plugins/**/*.ts',
-    'nuxt.config.ts',
-  ],
+  purge: {
+    // Learn more on https://tailwindcss.com/docs/controlling-file-size/#removing-unused-css
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      './src/components/**/*.vue',
+      './src/layouts/**/*.vue',
+      './src/pages/**/*.vue',
+      './src/plugins/**/*.ts',
+      'nuxt.config.ts',
+    ],
+  },
 }

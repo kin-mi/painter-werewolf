@@ -9,7 +9,7 @@
       @input="setName"
       @click="login"
     />
-    <RuleDescription class="w-full" />
+    <RuleDescription class="w-full pb-10" />
     <!-- <LoginButton
       class="w-full mt-3"
       :is-disabledd="!this.$accessor.auth.ready || !displayName"
