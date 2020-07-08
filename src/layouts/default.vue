@@ -20,6 +20,11 @@ export default Vue.extend({
       return !!Object.keys(this.$room.info).length
     },
   },
+  head: {
+    bodyAttrs: {
+      class: 'body',
+    },
+  },
 })
 </script>
 <style>
@@ -35,6 +40,46 @@ html {
   box-sizing: border-box;
 }
 
+.body {
+  background-position: 0px 0px, 24px 24px;
+  background-size: 48px 48px;
+  background-image: -webkit-linear-gradient(
+      45deg,
+      #fff2d6 25%,
+      transparent 25%,
+      transparent 75%,
+      #ffecc3 75%,
+      #ffecc3 100%
+    ),
+    -webkit-linear-gradient(45deg, #ffecc3 25%, #fff5e0 25%, #fff5e0 75%, #ffecc3
+          75%, #fff2d6 100%);
+  background-image: linear-gradient(
+      45deg,
+      #ffecc3 25%,
+      transparent 25%,
+      transparent 75%,
+      #ffecc3 75%,
+      #ffecc3 100%
+    ),
+    linear-gradient(
+      45deg,
+      #ffecc3 25%,
+      #fff5e0 25%,
+      #fff5e0 75%,
+      #ffecc3 75%,
+      #ffecc3 100%
+    );
+  animation: bg-slide 5s linear infinite;
+}
+@keyframes bg-slide {
+  0% {
+    background-position: 0px 0px, 24px 24px;
+  }
+  100% {
+    background-position: -24px -24px, 0px 0px;
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -47,7 +92,7 @@ html {
 }
 
 #content {
-  @apply min-h-screen flex flex-col bg-base;
+  @apply min-h-screen flex flex-col;
 }
 
 .page-enter-active,
