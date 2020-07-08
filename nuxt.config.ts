@@ -22,6 +22,8 @@ const config: Configuration = {
         name: 'description',
         content: '絵を描きながら人狼を探し当てるゲームです。',
       },
+      { name: 'robots', content: 'noindex' },
+      { name: 'robots', content: 'nofollow' },
     ],
     link: [
       {

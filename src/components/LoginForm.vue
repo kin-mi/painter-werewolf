@@ -11,7 +11,7 @@
         @input="$emit('input', $event.target.value)"
       />
     </div>
-    <div class="flex items-center justify-center flex-wrap mb-5 px-5">
+    <div class="flex items-center justify-center flex-wrap mb-6 px-5">
       <template v-for="(icon, index) in icons">
         <label :key="icon" class="inline-flex items-center w-1/5">
           <input
@@ -44,7 +44,7 @@ export default Vue.extend({
   props: { displayName: { type: String, default: '' } },
   data() {
     return {
-      selectedIcon: '1',
+      selectedIcon: '0',
     }
   },
   computed: {
@@ -77,10 +77,11 @@ export default Vue.extend({
   @apply py-2 px-3;
   @apply leading-tight;
   @apply border-b-4 border-orange-500;
-  @apply bg-base-light;
+  @apply bg-white;
   @apply text-center;
   @apply text-orange-500;
   @apply transition duration-300 ease-in-out;
+  --bg-opacity: 0.6;
 }
 .input:focus {
   @apply transform border-orange-700 text-orange-700;

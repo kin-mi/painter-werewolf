@@ -1,7 +1,10 @@
 <template>
-  <div class="container">
+  <div class="top-container">
     <h1 class="mt-2">
-      <img class="object-scale-down w-full max-w-2xl" src="/images/Logo.png" />
+      <img
+        class="object-scale-down w-full max-w-2xl max-h-full"
+        src="/images/Logo.png"
+      />
     </h1>
     <LoginForm
       class="w-full"
@@ -9,12 +12,7 @@
       @input="setName"
       @click="login"
     />
-    <RuleDescription class="w-full pb-10" />
-    <!-- <LoginButton
-      class="w-full mt-3"
-      :is-disabledd="!this.$accessor.auth.ready || !displayName"
-      @click="login"
-    /> -->
+    <RuleDescription class="w-full" />
     <Copyright />
   </div>
 </template>
@@ -76,8 +74,8 @@ export default Vue.extend({
 </script>
 
 <style>
-.container {
-  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto;
+.top-container {
+  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto pb-10;
 }
 
 .title {
