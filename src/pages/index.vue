@@ -7,12 +7,14 @@
       />
     </h1>
     <LoginForm
+      ref="loginForm"
       class="w-full"
       :display-name.sync="displayName"
       @input="setName"
       @click="login"
     />
     <RuleDescription class="w-full" />
+    <LoginButton class="mt-2" @click="login" />
     <Copyright />
   </div>
 </template>
@@ -21,12 +23,14 @@
 import Vue from 'vue'
 import LoginForm from '~/components/LoginForm.vue'
 import RuleDescription from '~/components/RuleDescription.vue'
+import LoginButton from '~/components/LoginButton.vue'
 import Copyright from '~/components/Copyright.vue'
 import { User } from '~/store/auth'
 
 export default Vue.extend({
   components: {
     LoginForm,
+    LoginButton,
     RuleDescription,
     Copyright,
   },
@@ -40,27 +44,54 @@ export default Vue.extend({
       this.displayName = value
     },
     async login() {
-      const user = this.$fireAuth.currentUser
-      if (user && this.displayName) {
-        user.updateProfile({
-          displayName: this.displayName,
-        })
-        this.setUser(user)
+      if (!this.$accessor.auth.ready || !this.displayName) {
+        const VueScrollTo = require('vue-scrollto')
+        VueScrollTo.scrollTo(this.$refs.loginForm)
       } else {
-        await this.$fireAuth
-          .signInAnonymously()
-          .then((result) => {
-            if (result?.user !== null) {
-              result.user.updateProfile({
-                displayName: this.displayName,
-              })
-              this.setUser(result.user)
-            }
+        const user = this.$fireAuth.currentUser
+        if (user) {
+          user.updateProfile({
+            displayName: this.displayName,
           })
-          // eslint-disable-next-line no-console
-          .catch((e) => console.error(e))
+          this.setUser(user)
+        } else {
+          await this.$fireAuth
+            .signInAnonymously()
+            .then((result) => {
+              if (result?.user !== null) {
+                result.user.updateProfile({
+                  displayName: this.displayName,
+                })
+                this.setUser(result.user)
+              }
+            })
+            // eslint-disable-next-line no-console
+            .catch((e) => console.error(e))
+        }
+        this.$router.push('lobby')
       }
-      this.$router.push('lobby')
+
+      // const user = this.$fireAuth.currentUser
+      // if (user && this.displayName) {
+      //   user.updateProfile({
+      //     displayName: this.displayName,
+      //   })
+      //   this.setUser(user)
+      // } else {
+      //   await this.$fireAuth
+      //     .signInAnonymously()
+      //     .then((result) => {
+      //       if (result?.user !== null) {
+      //         result.user.updateProfile({
+      //           displayName: this.displayName,
+      //         })
+      //         this.setUser(result.user)
+      //       }
+      //     })
+      //     // eslint-disable-next-line no-console
+      //     .catch((e) => console.error(e))
+      // }
+      // this.$router.push('lobby')
     },
     setUser(user: firebase.User) {
       this.$accessor.auth.SET_USER({
@@ -75,7 +106,7 @@ export default Vue.extend({
 
 <style>
 .top-container {
-  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto pb-10;
+  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto pb-16;
 }
 
 .title {

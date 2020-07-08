@@ -76,6 +76,7 @@ const config: Configuration = {
     // Doc: https://firebase.nuxtjs.org/guide/introduction/
     '@nuxtjs/firebase',
     '@nuxtjs/dayjs',
+    'vue-scrollto/nuxt',
   ],
   /*
    ** Axios module configuration

@@ -17,7 +17,8 @@
     "firebase": "^7.15.3",
     "konva": "^7.0.0",
     "nuxt": "^2.13.0",
-    "nuxt-typed-vuex": "^0.1.19"
+    "nuxt-typed-vuex": "^0.1.19",
+    "vue-scrollto": "^2.18.1"
   },
   "devDependencies": {
     "@nuxt/typescript-build": "^1.0.3",

@@ -15,7 +15,7 @@
 import Vue from 'vue'
 export default Vue.extend({
   props: {
-    isDisabled: { default: true, type: Boolean },
+    isDisabled: { default: false, type: Boolean },
   },
 })
 </script>
