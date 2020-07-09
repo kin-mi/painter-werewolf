@@ -22,6 +22,10 @@ import RoomList from '~/components/RoomList.vue'
 import Room from '~/components/Room.vue'
 
 export default Vue.extend({
+  transition: {
+    name: 'test',
+    mode: 'out-in',
+  },
   components: {
     RoomCreate,
     RoomList,

@@ -27,7 +27,7 @@
       <ul class="list">
         <li>
           <span>
-            みなさんは画家です。
+            みなさんは画家です
           </span>
         </li>
         <li>

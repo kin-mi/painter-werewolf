@@ -2,7 +2,7 @@
   <div class="top-container">
     <h1 class="mt-2 mx-2 w-full">
       <img
-        class="object-scale-down max-w-2xl max-h-full mx-auto"
+        class="object-scale-down w-full max-w-2xl mx-auto"
         src="/images/Logo.png"
       />
     </h1>

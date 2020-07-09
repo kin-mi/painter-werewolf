@@ -15,6 +15,7 @@ module.exports = {
           darkness: '#B49653',
         },
         paint: {
+          'leather-red': '#a03640',
           red: '#B91722',
           bule: '#09537C',
           green: '#677F58',
