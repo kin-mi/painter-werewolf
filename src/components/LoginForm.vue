@@ -13,13 +13,18 @@
     </div>
     <div class="flex items-center justify-center flex-wrap mb-6 px-5">
       <template v-for="(icon, index) in icons">
-        <label :key="icon" class="inline-flex items-center w-1/5">
+        <label
+          :key="`icon${index}`"
+          class="inline-flex items-center justify-center w-1/5"
+        >
           <input
-            :id="`icon_${index}`"
-            v-model="selectedIcon"
+            :id="`icon_${index + 1}`"
+            :name="`icon`"
             type="radio"
-            :value="index"
+            :value="index + 1"
+            :checked="String(index + 1) === selectedIcon"
             class="appearance-none"
+            @change="$emit('selected', $event.target.value)"
           />
           <img
             class="h-10 w-10 rounded-full border border-gray-500 bg-paint-gray cursor-pointer"
@@ -41,11 +46,9 @@ import { IconFileName } from '~/utils/constant'
 
 export default Vue.extend({
   components: { LoginButton },
-  props: { displayName: { type: String, default: '' } },
-  data() {
-    return {
-      selectedIcon: '0',
-    }
+  props: {
+    displayName: { type: String, default: '' },
+    selectedIcon: { type: String, default: '' },
   },
   computed: {
     inputClass(): string[] {
@@ -88,6 +91,6 @@ export default Vue.extend({
   @apply outline-none;
 }
 input[type='radio']:checked + img {
-  @apply bg-paint-green border-paint-bule;
+  @apply bg-paint-green border-paint-bule shadow-xl;
 }
 </style>

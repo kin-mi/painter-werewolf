@@ -1,8 +1,8 @@
 <template>
   <div class="top-container">
-    <h1 class="mt-2">
+    <h1 class="mt-2 mx-2 w-full">
       <img
-        class="object-scale-down w-full max-w-2xl max-h-full"
+        class="object-scale-down max-w-2xl max-h-full mx-auto"
         src="/images/Logo.png"
       />
     </h1>
@@ -10,7 +10,9 @@
       ref="loginForm"
       class="w-full"
       :display-name.sync="displayName"
+      :selected-icon.sync="selectedIcon"
       @input="setName"
+      @selected="setIcon"
       @click="login"
     />
     <RuleDescription class="w-full" />
@@ -25,6 +27,7 @@ import LoginForm from '~/components/LoginForm.vue'
 import RuleDescription from '~/components/RuleDescription.vue'
 import LoginButton from '~/components/LoginButton.vue'
 import Copyright from '~/components/Copyright.vue'
+import { IconFileName } from '~/utils/constant'
 import { User } from '~/store/auth'
 
 export default Vue.extend({
@@ -37,21 +40,37 @@ export default Vue.extend({
   data() {
     return {
       displayName: this.$accessor.auth.user.displayName,
+      selectedIcon: this.$accessor.auth.user.photoURL
+        ? String(
+            IconFileName.findIndex(
+              (e) => e === this.$accessor.auth.user.photoURL
+            ) + 1
+          )
+        : '1',
     }
+  },
+  computed: {
+    iconURL(): string {
+      return IconFileName[Number(this.selectedIcon) - 1]
+    },
   },
   methods: {
     setName(value: string) {
       this.displayName = value
+    },
+    setIcon(value: string) {
+      this.selectedIcon = value
     },
     async login() {
       if (!this.$accessor.auth.ready || !this.displayName) {
         const VueScrollTo = require('vue-scrollto')
         VueScrollTo.scrollTo(this.$refs.loginForm)
       } else {
-        const user = this.$fireAuth.currentUser
+        const user = this.$fireAuth.currentUser!
         if (user) {
           user.updateProfile({
             displayName: this.displayName,
+            photoURL: this.iconURL,
           })
           this.setUser(user)
         } else {
@@ -61,6 +80,7 @@ export default Vue.extend({
               if (result?.user !== null) {
                 result.user.updateProfile({
                   displayName: this.displayName,
+                  photoURL: this.iconURL,
                 })
                 this.setUser(result.user)
               }
@@ -76,6 +96,7 @@ export default Vue.extend({
         id: user.uid,
         displayName: user.displayName || '',
         playerName: this.displayName,
+        photoURL: this.iconURL,
       } as User)
     },
   },
@@ -84,7 +105,8 @@ export default Vue.extend({
 
 <style>
 .top-container {
-  @apply min-h-screen flex flex-wrap content-start justify-center items-start text-center mx-auto pb-16;
+  @apply flex flex-wrap content-start justify-center items-start;
+  @apply min-h-screen  text-center mx-auto pb-16;
 }
 
 .title {

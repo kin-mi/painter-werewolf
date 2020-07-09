@@ -4,6 +4,7 @@ export declare type User = {
   id: string
   displayName: string
   playerName: string
+  photoURL: string
 }
 
 export const state = () => ({
@@ -28,6 +29,7 @@ export const mutations = mutationTree(state, {
         ...state.user,
         id: authUser.uid,
         displayName: authUser.displayName || '',
+        photoURL: authUser.photoURL || '',
       } as User
     }
     state.ready = true
@@ -55,6 +57,7 @@ export const actions = actionTree(
               id: getters.user.id,
               displayName: getters.user.displayName || '',
               playerName: getters.user.displayName,
+              photoURL: getters.user.photoURL,
             })
             // already logged in
             return new Promise<string>((resolve) =>
