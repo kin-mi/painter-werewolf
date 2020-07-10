@@ -4,7 +4,7 @@
     <header class="header" :class="scrollY > 50 ? 'shrink' : ''">
       <div class="wrap">
         <img
-          class="object-scale-down w-full h-6 mx-auto px-4 bg-white bg-opacity-50 rounded-t-lg"
+          class="object-scale-down w-full h-6 mx-auto px-4 bg-white bg-opacity-50"
           src="/images/Logo.png"
         />
         <h1>LOBBY</h1>
