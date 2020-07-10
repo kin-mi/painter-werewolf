@@ -67,7 +67,6 @@ export default Vue.extend({
   methods: {
     calculateScrollY() {
       this.scrollY = window.scrollY
-      console.log(this.scrollY)
     },
   },
 })
