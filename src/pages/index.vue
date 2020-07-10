@@ -31,6 +31,7 @@ import { IconFileName } from '~/utils/constant'
 import { User } from '~/store/auth'
 
 export default Vue.extend({
+  layout: 'top',
   components: {
     LoginForm,
     LoginButton,

@@ -25,14 +25,7 @@ const config: Configuration = {
       { name: 'robots', content: 'noindex' },
       { name: 'robots', content: 'nofollow' },
     ],
-    link: [
-      {
-        rel: 'stylesheet',
-        href:
-          'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap',
-      },
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-    ],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
   /*
    ** Global CSS
@@ -77,6 +70,7 @@ const config: Configuration = {
     '@nuxtjs/firebase',
     '@nuxtjs/dayjs',
     'vue-scrollto/nuxt',
+    'nuxt-webfontloader',
   ],
   /*
    ** Axios module configuration
@@ -106,6 +100,22 @@ const config: Configuration = {
       },
       firestore: true,
       realtimeDb: true,
+    },
+  },
+  /**
+   * Web Fonts module configuration
+   * See https://github.com/Developmint/nuxt-webfontloader
+   */
+  webfontloader: {
+    // add Google Fonts as "custom" | workaround required
+    custom: {
+      families: ['Noto Sans JP:n3,n4', 'Slabo'],
+      urls: [
+        // for each Google Fonts add url + options you want
+        // here add font-display option
+        'https://fonts.googleapis.com/css?family=Noto+Sans+JP:wght@300,400&display=swap',
+        'https://fonts.googleapis.com/css?family=Slabo+27px&display=swap',
+      ],
     },
   },
   /*

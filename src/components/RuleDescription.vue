@@ -21,7 +21,7 @@
           >
         </li>
       </ul>
-      <h3 class="badge bg-paint-red mt-2">
+      <h3 class="badge mt-2">
         勝 敗
       </h3>
       <ul class="list">

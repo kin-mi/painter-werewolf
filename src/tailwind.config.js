@@ -29,6 +29,7 @@ module.exports = {
         },
       },
       height: {
+        '11/12': '91.666667%',
         'screen-1/5': '20vh',
       },
       maxHeight: {
@@ -38,6 +39,9 @@ module.exports = {
       minHeight: {
         '0': '0',
         'screen-1/5': '20vh',
+      },
+      transitionProperty: {
+        size: 'height, width',
       },
     },
   },
