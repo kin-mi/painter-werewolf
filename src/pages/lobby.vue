@@ -1,10 +1,9 @@
 <template>
   <div class="container">
+    <div class="logo-wrap">
+      <img class="logo" src="/images/Logo.png" />
+    </div>
     <header class="header">
-      <img
-        class="object-scale-down w-full h-6 mx-auto px-4 bg-white bg-opacity-50 rounded-sm"
-        src="/images/Logo.png"
-      />
       <div class="wrap">
         <h1>LOBBY</h1>
       </div>
@@ -12,6 +11,7 @@
     <template v-if="!isJoined">
       <RoomCreate class="w-full" />
       <RoomList class="w-full mt-4" />
+      <RoomList2 class="w-full mt-4" />
     </template>
     <!-- <template v-if="!isJoined">
       <div class="w-full flex items-center justify-center">
@@ -31,12 +31,14 @@
 import Vue from 'vue'
 import RoomCreate from '~/components/RoomCreate.vue'
 import RoomList from '~/components/RoomList.vue'
+import RoomList2 from '~/components/RoomList2.vue'
 // import Room from '~/components/Room.vue'
 
 export default Vue.extend({
   components: {
     RoomCreate,
     RoomList,
+    RoomList2,
     // Room,
   },
   async validate({ app, redirect }) {
@@ -62,29 +64,68 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style scoped>
 .container {
+  @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
   @apply w-10/12;
-  @apply my-3 mx-auto;
+  @apply my-3 mx-auto py-2;
   @apply text-center;
-  @apply rounded-lg;
+  @apply rounded-sm;
   @apply bg-paint-brown;
-  @apply border-2 border-paint-brown;
+  border-width: 5px;
+  border-color: #fcd7b1;
   background-image: url('/images/bg-cork.jpg');
   background-size: 100% auto;
-  @apply shadow-xl;
+  box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.3),
+    0px 0px 3px 3px rgba(0, 0, 0, 0.2) inset;
 }
 
 .header {
   @apply w-full;
   height: 100px;
-  @apply mt-1 mx-4;
+  @apply mt-0 mx-auto;
   @apply transition-size duration-500;
+}
+.logo-wrap {
+  @apply absolute top-0 right-0;
+  @apply w-1/3 h-auto mt-1 ml-auto mr-1;
+}
+.logo {
+  @apply object-scale-down px-1 py-1 bg-white bg-opacity-50 rounded-sm;
+  @apply transform translate-y-3;
+  --transform-rotate: 10deg;
+}
+@screen sm {
+  .logo {
+    @apply px-3;
+    @apply transform translate-y-4;
+    --transform-rotate: 10deg;
+  }
+}
+@screen md {
+  .logo {
+    @apply px-5;
+    @apply transform translate-y-5;
+    --transform-rotate: 10deg;
+  }
+}
+@screen lg {
+  .logo {
+    @apply px-8;
+    @apply transform translate-y-8;
+    --transform-rotate: 10deg;
+  }
+}
+
+.header .logo {
+  @apply absolute top-0 right-0;
+  @apply object-scale-down w-1/3 h-auto ml-auto px-8 py-1 bg-white bg-opacity-50 rounded-sm;
+  @apply transform translate-y-5;
+  --transform-rotate: 10deg;
 }
 .header .wrap {
   @apply w-full my-0 mx-auto;
-  /* width: 90%; */
   max-width: 69em;
 }
 .header h1 {
