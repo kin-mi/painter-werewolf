@@ -140,6 +140,7 @@ export default Vue.extend({
         return true
       })
       .catch(() => {
+        redirect('/')
         return false
       })
   },

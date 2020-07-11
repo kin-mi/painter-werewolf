@@ -1,15 +1,17 @@
 <template>
-  <div>
-    <div class="flex items-center justify-center">
+  <div class="flex flex-wrap items-center justify-center">
+    <div class="create-room-card">
       <button
-        style="width: 104px; height: 36px; font-size: 13px;"
-        class="hover:opacity-75 btn-primary"
+        class="btn-add"
         type="button"
         :disabled="!this.$accessor.auth.ready"
         @click="modalActivate"
       >
-        部屋を作成する
+        <plus-icon />
       </button>
+      <p class="text-paint-leather-red text-lg mt-3">
+        部屋を作成する
+      </p>
     </div>
 
     <!--Modal-->
@@ -197,7 +199,47 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style scoped>
+.create-room-card {
+  @apply flex flex-col flex-wrap items-center justify-center;
+  @apply pt-5 pb-2 px-3;
+  @apply rounded-md;
+  @apply bg-base;
+  box-shadow: 3px 3px 5px 3px rgba(0, 0, 0, 0.4);
+}
+.btn-add {
+  @apply relative;
+  @apply bg-paint-leather-red;
+  box-shadow: 0px 0px 0px 5px theme('colors.paint.leather-red'),
+    5px 5px 10px 3px rgb(0, 0, 0, 0.7);
+  @apply inline-flex items-center justify-center;
+  @apply rounded-full;
+  @apply outline-none;
+  @apply no-underline;
+  @apply p-4;
+  @apply text-base-light;
+  @apply border border-dashed border-base-darkness;
+  @apply transition duration-300 ease-in-out;
+}
+
+.btn-add:hover:not(:disabled) {
+  @apply border-dotted;
+}
+.btn-add:focus {
+  @apply outline-none;
+  box-shadow: 0px 0px 0px 5px theme('colors.paint.leather-red'),
+    5px 5px 5px 3px rgb(0, 0, 0, 0.7),
+    0px 0px 0px 7px theme('colors.paint.green');
+}
+
+.material-design-icon {
+  @apply absolute;
+  @apply top-0 left-0 right-0 bottom-0;
+  @apply flex justify-center items-center;
+  @apply m-auto;
+  @apply w-full h-full;
+}
+
 .modal {
   transition: opacity 0.25s ease;
 }

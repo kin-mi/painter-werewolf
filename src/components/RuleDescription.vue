@@ -97,6 +97,12 @@
   @apply rounded-lg;
   @apply bg-white bg-opacity-75;
 }
+@screen md {
+  .wrapper {
+    @apply max-w-md;
+  }
+}
+
 .badge {
   @apply w-24;
   @apply px-1;

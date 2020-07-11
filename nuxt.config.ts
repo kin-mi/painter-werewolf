@@ -40,6 +40,7 @@ const config: Configuration = {
     '~/plugins/room',
     '~/plugins/gameManager',
     '~/plugins/canvas',
+    '~/plugins/icons',
   ],
   /*
    ** Nuxt.js dev-modules

@@ -34,12 +34,9 @@ html, body {
   @apply border border-dashed border-base-darkness;
   @apply transition duration-300 ease-in-out;
 }
-.btn-primary:after {
-  @apply absolute;
-  @apply w-full h-full top-0 left-0;
-  @apply shadow-2xl;
-}
+
 .btn-primary:hover:not(:disabled) {
+  @apply outline-none;
   @apply border-dotted;
 }
 .btn-primary:disabled {
