@@ -91,7 +91,7 @@ export default Vue.extend({
 <style scoped>
 .list-header {
   @apply w-full;
-  @apply my-3;
+  @apply mt-3 mb-5;
   @apply tracking-widest;
   @apply text-xl;
   @apply font-round font-bold;
@@ -108,7 +108,7 @@ export default Vue.extend({
   }
 }
 .card-wrapper {
-  @apply relative flex flex-wrap flex-col w-full py-4;
+  @apply relative flex flex-wrap flex-col w-full py-6;
 }
 .card {
   @apply flex-1 w-11/12 max-w-sm h-auto mx-auto bg-base-light rounded-sm;
@@ -116,7 +116,7 @@ export default Vue.extend({
   box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.4);
 }
 .card-title {
-  @apply w-auto h-auto mt-3 mb-1 ml-5 mr-1 pt-2 bg-red-300;
+  @apply w-auto h-auto mt-5 mb-1 ml-5 mr-1 pt-3 bg-red-300;
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
 }
 .card-details {
@@ -156,18 +156,20 @@ export default Vue.extend({
 .tape {
   @apply absolute;
   top: 0;
-  left: 44%;
+  left: 50%;
   @apply transform;
+  --transform-translate-x: -4rem;
+  /* --transform-translate-y: -0.1rem; */
   --transform-rotate: -15deg;
-  @apply w-16 h-8 mx-auto bg-paint-red bg-opacity-50;
+  @apply w-32 h-10 mx-auto bg-paint-bule bg-opacity-50;
   background-image: linear-gradient(
     -90deg,
-    theme('colors.paint.red') 40%,
+    theme('colors.paint.bule') 40%,
     transparent 40%,
     transparent
   );
   background-size: 14px 14px;
-  @apply border-r-2 border-l-2 border-dotted border-paint-red;
+  @apply border-r-2 border-l-2 border-dotted border-paint-bule;
 }
 .nothing {
   @apply w-full;

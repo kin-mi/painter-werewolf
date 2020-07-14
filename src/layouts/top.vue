@@ -10,7 +10,7 @@ import Vue from 'vue'
 export default Vue.extend({
   head: {
     bodyAttrs: {
-      class: 'body',
+      class: 'top-body',
     },
   },
 })
@@ -28,7 +28,36 @@ html {
   box-sizing: border-box;
 }
 
-.body {
+/* .body {
+  background-position: 0px 0px, 48px 48px, 96px 96px, 144px 144px, 192px 192px,
+    240px 240px, 288px 288px, 336px 336px, 384px 384px, 432px 432px;
+  background-size: 48px 48px;
+  background-color: #fff5e0;
+  background-image: url('/images/symbol_pen.svg'), url('/images/symbol_pen.svg'),
+    url('/images/symbol_pen.svg'), url('/images/symbol_pen.svg'),
+    url('/images/symbol_pen.svg'), url('/images/symbol_pen.svg'),
+    url('/images/symbol_pen.svg'), url('/images/symbol_pen.svg'),
+    url('/images/symbol_pen.svg'), url('/images/symbol_mark.svg');
+  animation: bg-slide 5s linear infinite;
+} */
+
+.top-body {
+  background-position: 0px 0px, 24px 24px;
+  background-size: 48px 48px;
+  background-color: #fff5e0;
+  background-image: url('/images/symbol_pen.svg');
+  animation: bg-slide 5s linear infinite;
+}
+@keyframes bg-slide {
+  0% {
+    background-position: 0px 0px, 48px 48px;
+  }
+  100% {
+    background-position: -48px -48px, 0px 0px;
+  }
+}
+
+/* .body {
   background-position: 0px 0px, 24px 24px;
   background-size: 48px 48px;
   background-image: -webkit-linear-gradient(
@@ -58,15 +87,7 @@ html {
       #ffecc3 100%
     );
   animation: bg-slide 5s linear infinite;
-}
-@keyframes bg-slide {
-  0% {
-    background-position: 0px 0px, 24px 24px;
-  }
-  100% {
-    background-position: -24px -24px, 0px 0px;
-  }
-}
+} */
 
 *,
 *::before,

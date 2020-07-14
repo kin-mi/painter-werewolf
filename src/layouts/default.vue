@@ -43,40 +43,16 @@ html {
 .body {
   background-position: 0px 0px, 24px 24px;
   background-size: 48px 48px;
-  background-image: -webkit-linear-gradient(
-      45deg,
-      #fff2d6 25%,
-      transparent 25%,
-      transparent 75%,
-      #ffecc3 75%,
-      #ffecc3 100%
-    ),
-    -webkit-linear-gradient(45deg, #ffecc3 25%, #fff5e0 25%, #fff5e0 75%, #ffecc3
-          75%, #fff2d6 100%);
-  background-image: linear-gradient(
-      45deg,
-      #ffecc3 25%,
-      transparent 25%,
-      transparent 75%,
-      #ffecc3 75%,
-      #ffecc3 100%
-    ),
-    linear-gradient(
-      45deg,
-      #ffecc3 25%,
-      #fff5e0 25%,
-      #fff5e0 75%,
-      #ffecc3 75%,
-      #ffecc3 100%
-    );
+  background-color: #fff5e0;
+  background-image: url('/images/symbol_pen.svg');
   animation: bg-slide 5s linear infinite;
 }
 @keyframes bg-slide {
   0% {
-    background-position: 0px 0px, 24px 24px;
+    background-position: 0px 0px, 48px 48px;
   }
   100% {
-    background-position: -24px -24px, 0px 0px;
+    background-position: -48px -48px, 0px 0px;
   }
 }
 
