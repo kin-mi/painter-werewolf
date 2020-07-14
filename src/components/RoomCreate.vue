@@ -121,11 +121,8 @@
             </form>
 
             <!--Footer-->
-            <div class="flex justify-center pt-2">
-              <button
-                class="px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400"
-                @click="createRoom"
-              >
+            <div class="flex justify-center mt-3">
+              <button class="btn-primary" @click="createRoom">
                 募集する
               </button>
             </div>
@@ -195,7 +192,7 @@ export default Vue.extend({
   @apply w-full flex content-center justify-center;
 }
 .btn-wrapper {
-  @apply flex w-auto h-auto;
+  @apply flex w-auto h-12;
 }
 .btn-label {
   @apply w-6 py-2;
@@ -207,7 +204,7 @@ export default Vue.extend({
 .btn-add {
   @apply inline-flex items-center justify-center;
   @apply px-4 py-2;
-  @apply rounded-r-sm;
+  @apply rounded-r-md;
   @apply outline-none;
   @apply no-underline;
   @apply bg-base-light;

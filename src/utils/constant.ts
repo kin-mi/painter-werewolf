@@ -22,12 +22,12 @@ export type UserStatus = typeof userStatus[number]
 export const UserColors = {
   black: '#221714',
   red: '#B91722',
-  bule: '#09537C',
+  blue: '#09537C',
   green: '#677F58',
   orange: '#E39827',
   pink: '#D38B93',
   yellow: '#E1B453',
-  skybule: '#5C899D',
+  skyblue: '#5C899D',
   gray: '#B1B0B7',
   brown: '#674129',
 } as const

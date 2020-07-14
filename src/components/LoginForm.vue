@@ -85,6 +85,6 @@ export default Vue.extend({
   @apply outline-none;
 }
 input[type='radio']:checked + img {
-  @apply bg-paint-green border-paint-bule shadow-xl;
+  @apply bg-paint-green border-paint-blue shadow-xl;
 }
 </style>
