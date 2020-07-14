@@ -68,7 +68,7 @@ export default Vue.extend({
   @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
   @apply w-10/12;
-  @apply mb-3 mx-auto pb-2;
+  @apply my-3 mx-auto pb-2;
   @apply text-center;
   @apply rounded-sm;
   border-width: 5px;
