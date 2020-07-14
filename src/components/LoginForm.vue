@@ -33,19 +33,13 @@
         </label>
       </template>
     </div>
-    <LoginButton
-      :is-disabled="!this.$accessor.auth.ready || !displayName"
-      @click="$emit('click')"
-    />
   </div>
 </template>
 <script lang="ts">
 import Vue from 'vue'
-import LoginButton from '~/components/LoginButton.vue'
 import { IconFileName } from '~/utils/constant'
 
 export default Vue.extend({
-  components: { LoginButton },
   props: {
     displayName: { type: String, default: '' },
     selectedIcon: { type: String, default: '' },
@@ -64,7 +58,7 @@ export default Vue.extend({
 .wrapper {
   @apply w-full;
   @apply max-w-xs;
-  @apply py-5;
+  @apply py-4;
   @apply mx-auto mt-3;
   @apply bg-base-dark;
   @apply border-2 border-base-darkness;

@@ -1,19 +1,18 @@
 <template>
   <div class="container">
     <div class="logo-wrap">
-      <img class="logo" src="/images/Logo.png" />
+      <img class="logo" src="/images/logo_title.svg" alt="お絵かき人狼" />
     </div>
     <header class="header">
       <div class="wrap">
-        <img class="w-1/2 mx-auto text-red-600" src="/images/lobby3.svg" />
-
-        <!-- <h1>LOBBY</h1> -->
+        <h1>
+          <img class="header-logo" src="/images/lobby2.svg" alt="LOBBY" />
+        </h1>
       </div>
     </header>
     <template v-if="!isJoined">
-      <!-- <RoomCreate class="w-full" /> -->
-      <RoomList class="w-full mt-4" />
-      <RoomList2 class="w-full mt-4" />
+      <RoomCreate class="w-full mt-4" />
+      <RoomList class="w-full mt-3" />
     </template>
     <!-- <template v-if="!isJoined">
       <div class="w-full flex items-center justify-center">
@@ -31,13 +30,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
-// import RoomCreate from '~/components/RoomCreate.vue'
+import RoomCreate from '~/components/RoomCreate.vue'
 import RoomList from '~/components/RoomList.vue'
 // import Room from '~/components/Room.vue'
 
 export default Vue.extend({
   components: {
-    // RoomCreate,
+    RoomCreate,
     RoomList,
     // Room,
   },
@@ -69,7 +68,7 @@ export default Vue.extend({
   @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
   @apply w-10/12;
-  @apply my-3 mx-auto pb-2;
+  @apply mb-3 mx-auto pb-2;
   @apply text-center;
   @apply rounded-sm;
   border-width: 5px;
@@ -83,14 +82,15 @@ export default Vue.extend({
 
 .header {
   @apply w-full h-auto;
-  @apply mt-3 mx-auto;
+  @apply mx-auto;
   @apply transition-size duration-500;
 }
 .logo-wrap {
-  @apply w-1/3 h-auto mt-1 ml-auto mr-1;
+  @apply absolute top-0 left-0;
+  @apply w-full h-auto mt-1 mr-1 text-right;
 }
 .logo {
-  @apply object-scale-down px-1 py-1 bg-white bg-opacity-50 rounded-sm;
+  @apply object-scale-down w-1/3 ml-auto px-1 py-1 bg-white bg-opacity-50 rounded-sm;
   @apply transform translate-y-3;
   --transform-rotate: 10deg;
 }
@@ -120,20 +120,7 @@ export default Vue.extend({
   @apply w-full my-0 mx-auto;
   max-width: 69em;
 }
-.header h1 {
-  @apply inline-block relative;
-  text-shadow: -1px 0px theme('colors.white'), 0px -1px theme('colors.white'),
-    1px 0px theme('colors.white'), 0px 1px theme('colors.white'),
-    1px 1px theme('colors.white'), -1px -1px theme('colors.white'),
-    1px -1px theme('colors.white'), -1px 1px theme('colors.white');
-  line-height: 80px;
-}
-
-.header h1 {
-  @apply m-0 mx-auto;
-  @apply text-paint-brown;
-  font-family: 'Slabo 27px', serif;
-  font-size: 72px;
-  text-transform: uppercase;
+.header-logo {
+  @apply w-full mx-auto text-red-600;
 }
 </style>

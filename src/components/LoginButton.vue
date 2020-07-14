@@ -6,12 +6,11 @@
       :disabled="isDisabled"
       @click="$emit('click')"
     >
-      はじめる
+      <slot />
     </button>
   </div>
 </template>
 <script lang="ts">
-// :disabled="!this.$accessor.auth.ready || !displayName"
 import Vue from 'vue'
 export default Vue.extend({
   props: {

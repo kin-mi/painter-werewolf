@@ -110,12 +110,12 @@ const config: Configuration = {
   webfontloader: {
     // add Google Fonts as "custom" | workaround required
     custom: {
-      families: ['Noto Sans JP:n3,n4', 'Slabo'],
+      families: ['Noto Sans JP:n3,n4', 'M PLUS Rounded 1c:n3,n4'],
       urls: [
         // for each Google Fonts add url + options you want
         // here add font-display option
         'https://fonts.googleapis.com/css?family=Noto+Sans+JP:wght@300,400&display=swap',
-        'https://fonts.googleapis.com/css?family=Slabo+27px&display=swap',
+        'https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:wght@300,400&display=swap',
       ],
     },
   },

@@ -7,6 +7,9 @@
 module.exports = {
   theme: {
     extend: {
+      fontFamily: {
+        round: ['"M PLUS Rounded 1c"', 'sans-serif'],
+      },
       colors: {
         base: {
           light: '#FFF5E0',

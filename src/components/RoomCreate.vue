@@ -1,147 +1,138 @@
 <template>
   <div class="flex flex-wrap items-center justify-center">
     <div class="create-room-card">
-      <button
-        class="btn-add"
-        type="button"
-        :disabled="!this.$accessor.auth.ready"
-        @click="modalActivate"
-      >
-        <plus-icon />
-      </button>
-      <p class="text-paint-leather-red text-lg mt-3">
-        部屋を作成する
-      </p>
+      <div class="btn-wrapper">
+        <div class="btn-label"><plus-icon /></div>
+        <button
+          class="btn-add"
+          type="button"
+          :disabled="!this.$accessor.auth.ready"
+          @click="modalActivate"
+        >
+          募集する
+        </button>
+      </div>
     </div>
 
     <!--Modal-->
-    <div
-      class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
-      :class="modalActive ? '' : 'opacity-0 pointer-events-none '"
-    >
-      <div
-        class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"
-        @click="modalClose"
-      />
+    <transition name="modal">
+      <div v-if="modalActive" class="modal">
+        <div class="modal-overlay" @click="modalClose" />
 
-      <div
-        class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"
-      >
-        <!-- Add margin if you want to see some of the overlay behind the modal-->
-        <div class="modal-content py-4 text-left px-6">
-          <!--Title-->
-          <div class="flex justify-between items-center pb-3">
-            <p class="text-2xl font-bold">部屋を作成</p>
-            <div class="modal-close cursor-pointer z-50" @click="modalClose">
-              <svg
-                class="fill-current text-black"
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-              >
-                <path
-                  d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"
-                ></path>
-              </svg>
+        <div class="modal-container">
+          <!-- Add margin if you want to see some of the overlay behind the modal-->
+          <div class="modal-content">
+            <!--Title-->
+            <div class="modal-title">
+              <p>ゲーム設定</p>
+              <div class="modal-close" @click="modalClose">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                >
+                  <path
+                    d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"
+                  ></path>
+                </svg>
+              </div>
             </div>
-          </div>
 
-          <!--Body-->
-          <form class="w-full max-w-sm flex flex-col">
-            <label for="category">
-              お題カテゴリ
-            </label>
-            <select
-              id="category"
-              v-model="roomConfig.category"
-              class="border-b text-right"
-            >
-              <option
-                v-for="(category, index) in categoreis"
-                :key="`${category}${index}`"
-                >{{ category }}</option
+            <!--Body-->
+            <form class="modal-body">
+              <label for="category" class="modal-form-label">
+                お題カテゴリ
+              </label>
+              <select
+                id="category"
+                v-model="roomConfig.category"
+                class="modal-form-part"
               >
-            </select>
-            <label for="theme">
-              お題テーマ
-            </label>
-            <select
-              id="theme"
-              v-model="roomConfig.theme"
-              class="border-b text-right"
-            >
-              <option
-                v-for="(theme, index) in themes"
-                :key="`${theme}${index}`"
-                >{{ theme }}</option
+                <option
+                  v-for="(category, index) in categoreis"
+                  :key="`${category}${index}`"
+                  >{{ category }}</option
+                >
+              </select>
+              <label for="theme" class="modal-form-label">
+                お題テーマ
+              </label>
+              <select
+                id="theme"
+                v-model="roomConfig.theme"
+                class="modal-form-part"
               >
-            </select>
-            <label for="turn">
-              ターン数
-            </label>
-            <input
-              id="trun"
-              v-model="roomConfig.round"
-              class="border-b text-right"
-              type="number"
-              min="1"
-              max="10"
-            />
-            <label for="limitPlayers">
-              最大人数
-            </label>
-            <input
-              id="limitPlayers"
-              v-model="roomConfig.limitPlayers"
-              class="border-b text-right"
-              type="number"
-              min="3"
-              max="10"
-            />
-            <label for="watch">
-              観戦許可
-            </label>
-            <input
-              id="watch"
-              v-model="roomConfig.watch"
-              class="border-b text-right"
-              type="checkbox"
-            />
-            <label for="chat">
-              チャット有無
-            </label>
-            <input
-              id="chat"
-              v-model="roomConfig.chat"
-              class="border-b text-right"
-              type="checkbox"
-            />
-            <label for="message">
-              募集メッセージ
-            </label>
-            <input
-              id="message"
-              v-model="roomConfig.message"
-              class="border-b text-right"
-              type="text"
-              min="1"
-              max="10"
-            />
-          </form>
+                <option
+                  v-for="(theme, index) in themes"
+                  :key="`${theme}${index}`"
+                  >{{ theme }}</option
+                >
+              </select>
+              <label for="turn" class="modal-form-label">
+                ターン数
+              </label>
+              <input
+                id="trun"
+                v-model="roomConfig.round"
+                class="modal-form-part"
+                type="number"
+                min="1"
+                max="10"
+              />
+              <label for="limitPlayers" class="modal-form-label">
+                最大人数
+              </label>
+              <input
+                id="limitPlayers"
+                v-model="roomConfig.limitPlayers"
+                class="modal-form-part"
+                type="number"
+                min="3"
+                max="10"
+              />
+              <label for="watch" class="modal-form-label">
+                観戦許可
+              </label>
+              <input
+                id="watch"
+                v-model="roomConfig.watch"
+                class="modal-form-part"
+                type="checkbox"
+              />
+              <label for="chat" class="modal-form-label">
+                チャット有無
+              </label>
+              <input
+                id="chat"
+                v-model="roomConfig.chat"
+                class="modal-form-part"
+                type="checkbox"
+              />
+              <label for="message" class="modal-form-label">
+                募集メッセージ
+              </label>
+              <input
+                id="message"
+                v-model="roomConfig.message"
+                class="modal-form-part"
+                type="text"
+              />
+            </form>
 
-          <!--Footer-->
-          <div class="flex justify-end pt-2">
-            <button
-              class="px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400"
-              @click="createRoom"
-            >
-              作成する
-            </button>
+            <!--Footer-->
+            <div class="flex justify-center pt-2">
+              <button
+                class="px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400"
+                @click="createRoom"
+              >
+                募集する
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 <script lang="ts">
@@ -201,60 +192,109 @@ export default Vue.extend({
 
 <style scoped>
 .create-room-card {
-  @apply flex flex-col flex-wrap items-center justify-center;
-  @apply pt-5 pb-2 px-3;
-  @apply rounded-md;
-  @apply bg-base;
-  box-shadow: 3px 3px 5px 3px rgba(0, 0, 0, 0.4);
+  @apply w-full flex content-center justify-center;
+}
+.btn-wrapper {
+  @apply flex w-auto h-auto;
+}
+.btn-label {
+  @apply w-6 py-2;
+  @apply rounded-l-sm;
+  @apply bg-red-300;
+  @apply text-red-800;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
 }
 .btn-add {
-  @apply relative;
-  @apply bg-paint-leather-red;
-  box-shadow: 0px 0px 0px 5px theme('colors.paint.leather-red'),
-    5px 5px 10px 3px rgb(0, 0, 0, 0.7);
   @apply inline-flex items-center justify-center;
-  @apply rounded-full;
+  @apply px-4 py-2;
+  @apply rounded-r-sm;
   @apply outline-none;
   @apply no-underline;
-  @apply p-4;
-  @apply text-base-light;
-  @apply border border-dashed border-base-darkness;
-  @apply transition duration-300 ease-in-out;
+  @apply bg-base-light;
+  @apply text-red-800 text-lg;
+  @apply font-round;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
 }
 
-.btn-add:hover:not(:disabled) {
-  @apply border-dotted;
+.btn-wrapper:hover {
+  @apply transition-all duration-300 transform;
+  --transform-rotate: -2deg;
+}
+.btn-add:hover {
+  @apply font-bold;
 }
 .btn-add:focus {
   @apply outline-none;
-  box-shadow: 0px 0px 0px 5px theme('colors.paint.leather-red'),
-    5px 5px 5px 3px rgb(0, 0, 0, 0.7),
-    0px 0px 0px 7px theme('colors.paint.green');
+  @apply font-bold;
 }
 
-.material-design-icon {
-  @apply absolute;
-  @apply top-0 left-0 right-0 bottom-0;
-  @apply flex justify-center items-center;
-  @apply m-auto;
-  @apply w-full h-full;
+.material-design-icon svg {
+  @apply inline-block;
 }
 
 .modal {
+  @apply z-20;
+  @apply fixed w-full h-full top-0 left-0;
+  @apply flex items-center justify-center;
+  @apply overflow-x-hidden overflow-y-visible;
   transition: opacity 0.25s ease;
 }
-.modal-active {
-  overflow-x: hidden;
-  overflow-y: visible !important;
+
+.modal-overlay {
+  @apply absolute w-full h-full;
+  @apply bg-gray-900 opacity-50;
 }
-.toggle__dot {
-  top: -0.25rem;
-  left: -0.25rem;
-  transition: all 0.3s ease-in-out;
+.modal-container {
+  @apply z-30;
+  @apply w-11/12 max-w-sm mx-auto;
+  @apply bg-base-light rounded shadow-lg overflow-y-auto;
 }
 
-input:checked ~ .toggle__dot {
-  transform: translateX(100%);
-  background-color: #48bb78;
+.modal-content {
+  @apply py-4 text-left px-6;
+}
+.modal-title {
+  @apply flex justify-between items-center pb-3;
+}
+.modal-title p {
+  @apply text-2xl font-bold text-paint-brown;
+  background: linear-gradient(transparent 80%, #c6999f 80%);
+}
+.modal-close {
+  @apply cursor-pointer z-30;
+}
+.modal-close svg {
+  @apply fill-current text-black;
+}
+.modal-body {
+  @apply w-full max-w-sm flex flex-col;
+}
+.modal-form-label {
+  @apply pt-2 text-sm text-paint-brown;
+}
+.modal-form-part {
+  @apply w-56 border-b text-left text-paint-brown font-bold px-2 py-1 bg-base-dark bg-opacity-50 rounded-t-sm border-paint-brown;
+}
+.modal-form-part[type='number'] {
+  @apply w-12;
+}
+.modal-form-part[type='checkbox'] {
+  @apply w-auto;
+}
+.modal-form-label[for='message'] {
+  @apply text-red-800;
+}
+.modal-form-part#message {
+  @apply w-full text-red-900 bg-red-800 bg-opacity-25;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  @apply transition-opacity;
+}
+
+.modal-enter,
+.modal-leave-to {
+  @apply opacity-0 duration-300;
 }
 </style>

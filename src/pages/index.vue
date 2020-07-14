@@ -3,7 +3,7 @@
     <h1 class="mt-2 mx-2 w-full">
       <img
         class="object-scale-down w-full max-w-2xl mx-auto"
-        src="/images/Logo.png"
+        src="/images/logo_title.svg"
       />
     </h1>
     <LoginForm
@@ -13,10 +13,10 @@
       :selected-icon.sync="selectedIcon"
       @input="setName"
       @selected="setIcon"
-      @click="login"
     />
-    <RuleDescription class="w-full" />
-    <LoginButton class="mt-3" @click="login" />
+    <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
+    <RuleDescription class="w-full mt-5" />
+    <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
     <Copyright />
   </div>
 </template>

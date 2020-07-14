@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full mt-3">
+  <div>
     <div class="wrapper">
       <h2 class="text-paint-brown font-bold text-2xl">ルール説明</h2>
       <h3 class="badge mt-2">

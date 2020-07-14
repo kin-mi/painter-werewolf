@@ -1,14 +1,16 @@
 <template>
   <div class="flex flex-wrap items-center justify-center">
     <h3 class="list-header">募集一覧</h3>
-
+    <div v-if="list.length < 0" class="nothing">
+      <p>現在募集はありません</p>
+    </div>
     <div v-for="room in list" :key="room.id" class="card-wrapper">
       <div class="card">
         <div class="card-title">
           <p class="text-orange-800 text-xs" style="line-height: 0.9rem;">
             お題
           </p>
-          <p class="text-orange-800 text-lg">{{ room.theme }}</p>
+          <p class="text-orange-800 text-lg font-bold">{{ room.theme }}</p>
         </div>
         <div class="card-details">
           <p>
@@ -42,7 +44,7 @@
         </div>
         <div class="card-btn">
           <button class="btn-watch" type="button" :disabled="!room.watch">
-            観戦
+            観戦する
           </button>
           <button
             class="btn-join"
@@ -52,7 +54,7 @@
             "
             @click="join(room.id)"
           >
-            参加
+            参加する
           </button>
         </div>
       </div>
@@ -91,13 +93,26 @@ export default Vue.extend({
   @apply w-full;
   @apply my-3;
   @apply tracking-widest;
-  @apply text-2xl;
+  @apply text-xl;
+  @apply font-round font-bold;
+  @apply text-paint-brown;
+}
+@screen sm {
+  .list-header {
+    @apply text-2xl;
+  }
+}
+@screen md {
+  .list-header {
+    @apply text-3xl;
+  }
 }
 .card-wrapper {
   @apply relative flex flex-wrap flex-col w-full py-4;
 }
 .card {
   @apply flex-1 w-11/12 max-w-sm h-auto mx-auto bg-base-light rounded-sm;
+  @apply font-round;
   box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.4);
 }
 .card-title {
@@ -118,13 +133,16 @@ export default Vue.extend({
   @apply flex w-full h-auto p-1;
 }
 .btn-watch {
+  @apply relative;
   @apply inline-flex items-center justify-center;
   @apply w-1/2;
   @apply m-1;
   @apply rounded-full;
   @apply border border-paint-bule;
   @apply text-paint-bule;
+  @apply tracking-widest;
 }
+
 .btn-join {
   @apply inline-flex items-center justify-center;
   @apply w-1/2;
@@ -132,6 +150,7 @@ export default Vue.extend({
   @apply rounded-full;
   @apply border border-paint-red;
   @apply text-paint-red;
+  @apply tracking-widest;
 }
 
 .tape {
@@ -139,7 +158,7 @@ export default Vue.extend({
   top: 0;
   left: 48%;
   @apply transform translate-y-1;
-  --transform-rotate: 15deg;
+  --transform-rotate: -15deg;
   @apply w-10 h-5 mx-auto bg-paint-bule bg-opacity-50;
   background-image: linear-gradient(
     -90deg,
@@ -148,5 +167,13 @@ export default Vue.extend({
     transparent
   );
   background-size: 14px 14px;
+}
+.nothing {
+  @apply w-full;
+  @apply my-3;
+  @apply tracking-widest;
+  @apply text-lg;
+  @apply font-round font-bold;
+  @apply text-paint-brown;
 }
 </style>
