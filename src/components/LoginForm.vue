@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="mb-3">
+    <div class="mt-2 mb-3">
       <input
         id="username"
         class="input"
@@ -11,7 +11,7 @@
         @input="$emit('input', $event.target.value)"
       />
     </div>
-    <div class="flex items-center justify-center flex-wrap mb-6 px-5">
+    <div class="flex items-center justify-center flex-wrap mb-2 px-5">
       <template v-for="(icon, index) in icons">
         <label
           :key="`icon${index}`"

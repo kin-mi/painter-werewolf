@@ -112,7 +112,7 @@
   @apply text-sm font-bold;
 }
 .badge-underline {
-  @apply w-20;
+  @apply w-24;
   @apply px-1;
   @apply text-center text-paint-brown;
   @apply text-sm font-bold;

@@ -7,10 +7,10 @@
     <div v-for="room in list" :key="room.id" class="card-wrapper">
       <div class="card">
         <div class="card-title">
-          <p class="text-orange-800 text-xs" style="line-height: 0.9rem;">
+          <p class="text-red-800 text-xs" style="line-height: 0.9rem;">
             お題
           </p>
-          <p class="text-orange-800 text-lg font-bold">{{ room.theme }}</p>
+          <p class="text-red-800 text-lg font-bold">{{ room.theme }}</p>
         </div>
         <div class="card-details">
           <p>
@@ -39,8 +39,8 @@
           </p>
         </div>
         <div class="card-message">
-          <p class="text-red-800 text-xs">メッセージ</p>
-          <p class="text-red-800 text-lg">{{ room.message || '&nbsp;' }}</p>
+          <p class="text-paint-brown text-xs">メッセージ</p>
+          <p class="text-paint-brown text-lg">{{ room.message || '&nbsp;' }}</p>
         </div>
         <div class="card-btn">
           <button class="btn-watch" type="button" :disabled="!room.watch">
@@ -116,7 +116,7 @@ export default Vue.extend({
   box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.4);
 }
 .card-title {
-  @apply w-auto h-auto my-1 ml-5 mr-1 pt-2 bg-orange-300;
+  @apply w-auto h-auto mt-3 mb-1 ml-5 mr-1 pt-2 bg-red-300;
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
 }
 .card-details {
@@ -126,7 +126,7 @@ export default Vue.extend({
   @apply inline-block;
 }
 .card-message {
-  @apply w-auto h-auto my-1 ml-1 mr-5 bg-red-300;
+  @apply w-auto h-auto my-1 ml-1 mr-5 pb-1;
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
 }
 .card-btn {
@@ -156,17 +156,18 @@ export default Vue.extend({
 .tape {
   @apply absolute;
   top: 0;
-  left: 48%;
-  @apply transform translate-y-1;
+  left: 44%;
+  @apply transform;
   --transform-rotate: -15deg;
-  @apply w-10 h-5 mx-auto bg-paint-bule bg-opacity-50;
+  @apply w-16 h-8 mx-auto bg-paint-red bg-opacity-50;
   background-image: linear-gradient(
     -90deg,
-    theme('colors.paint.bule') 40%,
+    theme('colors.paint.red') 40%,
     transparent 40%,
     transparent
   );
   background-size: 14px 14px;
+  @apply border-r-2 border-l-2 border-dotted border-paint-red;
 }
 .nothing {
   @apply w-full;

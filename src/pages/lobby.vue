@@ -1,8 +1,5 @@
 <template>
   <div class="container">
-    <div class="logo-wrap">
-      <img class="logo" src="/images/logo_title.svg" alt="お絵かき人狼" />
-    </div>
     <header class="header">
       <div class="wrap">
         <h1>
@@ -67,7 +64,7 @@ export default Vue.extend({
 .container {
   @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
-  @apply w-10/12;
+  @apply w-10/12 max-w-lg;
   @apply my-3 mx-auto pb-2;
   @apply text-center;
   @apply rounded-sm;
@@ -84,36 +81,6 @@ export default Vue.extend({
   @apply w-full h-auto;
   @apply mx-auto;
   @apply transition-size duration-500;
-}
-.logo-wrap {
-  @apply absolute top-0 left-0;
-  @apply w-full h-auto mt-1 mr-1 text-right;
-}
-.logo {
-  @apply object-scale-down w-1/3 ml-auto px-1 py-1 bg-white bg-opacity-50 rounded-sm;
-  @apply transform translate-y-3;
-  --transform-rotate: 10deg;
-}
-@screen sm {
-  .logo {
-    @apply px-3;
-    @apply transform translate-y-4;
-    --transform-rotate: 10deg;
-  }
-}
-@screen md {
-  .logo {
-    @apply px-5;
-    @apply transform translate-y-5;
-    --transform-rotate: 10deg;
-  }
-}
-@screen lg {
-  .logo {
-    @apply px-8;
-    @apply transform translate-y-8;
-    --transform-rotate: 10deg;
-  }
 }
 
 .header .wrap {
