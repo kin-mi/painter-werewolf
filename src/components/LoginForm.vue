@@ -84,7 +84,17 @@ export default Vue.extend({
   @apply transform border-orange-700 text-orange-700;
   @apply outline-none;
 }
+input[type='radio'],
+input[type='radio'] + img {
+  @apply select-none;
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer */
+  -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+  -webkit-user-select: none; /* Chrome, Safari, and Opera */
+  -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+}
 input[type='radio']:checked + img {
+  @apply outline-none;
   @apply bg-paint-green border-paint-blue shadow-xl;
 }
 </style>

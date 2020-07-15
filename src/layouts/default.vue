@@ -41,6 +41,7 @@ html {
 }
 
 .body {
+  @apply bg-fixed;
   background-position: 0px 0px;
   background-size: 600px 400px;
   background-color: #fff5e0;

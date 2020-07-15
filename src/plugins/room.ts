@@ -45,6 +45,7 @@ export type RoomUser = {
   playerName: string
   status: UserStatus
   color: UserColors
+  icon: string
 }
 export type Room = {
   id: string
@@ -118,6 +119,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
           playerName: user.playerName,
           status: 'online',
           color: UserColors.black,
+          icon: user.photoURL,
         } as RoomUser,
       ],
       watchers: [],
@@ -160,6 +162,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
           playerName: user.playerName,
           status: 'online',
           color: _findNextColor(room),
+          icon: user.photoURL,
         } as RoomUser
 
         const playersIdx = room.players.findIndex((id) => id === user.id)
@@ -205,24 +208,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    */
   async function exit(roomId: string): Promise<void> {
     const user = ctx.app.$accessor.auth.user
-    const joinedUser =
-      state.currentRoom.playersStatus.find(
-        (e) => e.id === user.id && e.status === 'online'
-      ) ||
-      state.currentRoom.watchers.find(
-        (e) => e.id === user.id && e.status === 'online'
-      )
-    if (!joinedUser) return
-
-    const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
-
-    const userPayload = {
-      ...joinedUser,
-      status: 'exit',
-    } as RoomUser
-
-    await _updateUserStatus(roomDocRef, userPayload)
-
     await ctx.app.$fireStore
       .runTransaction(async (trn) => {
         const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
@@ -254,42 +239,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
         // set current room
         state.currentRoom = {} as Room
       })
-  }
-
-  // 部屋にいるユーザーステータスを更新する
-  async function _updateUserStatus(
-    roomDocRef: firestore.DocumentReference,
-    user: RoomUser
-  ): Promise<Room | undefined> {
-    let room: Room | undefined
-    // Start transaction.
-    await ctx.app.$fireStore.runTransaction(async (trn) => {
-      // 現在の部屋情報を取得
-      const roomSnap = await trn.get(roomDocRef)
-      if (!roomSnap.exists) throw new Error(`Not found room. ${roomDocRef.id}`)
-      room = dataToRoom(roomSnap.data()!)
-
-      const targetUserIdx = room.playersStatus.findIndex(
-        (e) => e.id === user.id && e.status === 'online'
-      )
-      if (targetUserIdx !== -1) {
-        // 対象のユーザーが存在する場合、更新
-        room.playersStatus.splice(targetUserIdx, 1, user)
-        // 退出の場合、参加者リストからも削除
-        if (user.status === 'exit')
-          room.players = room.players.filter((e) => e !== user.id)
-      } else {
-        // 存在しない場合、追加
-        room.playersStatus.push(user)
-        room.players.push(user.id)
-      }
-      trn.update(roomDocRef, {
-        players: room.players,
-        playersStatus: room.playersStatus,
-        updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
-      } as Room)
-    })
-    return room
   }
 
   /******************************

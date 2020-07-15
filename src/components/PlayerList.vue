@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex flex-wrap justify-center">
+  <div class="w-full flex justify-center">
     <div
       v-for="user in onlineUsers"
       :key="user.id"
