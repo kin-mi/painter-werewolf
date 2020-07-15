@@ -1,5 +1,6 @@
 <template>
   <div>
+    <PlayerList />
     <h2>{{ room.message }}</h2>
     <h3>待機中のユーザー：{{ onlineUsers.length }}人</h3>
     <ol class="list-none">
@@ -46,8 +47,12 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import PlayerList from '~/components/PlayerList.vue'
 import { Room, RoomUser } from '~/plugins/room'
 export default Vue.extend({
+  components: {
+    PlayerList,
+  },
   computed: {
     room(): Room {
       return this.$room.info

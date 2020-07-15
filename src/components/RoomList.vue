@@ -116,7 +116,7 @@ export default Vue.extend({
   box-shadow: 0 0 7px rgba(0, 0, 0, 0.4);
 }
 .card-title {
-  @apply w-auto h-auto mt-5 mb-1 pt-3 bg-red-300;
+  @apply w-auto h-auto mt-5 mb-1 mx-2 pt-3 bg-red-300;
   /* box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3); */
 }
 .card-details {
@@ -139,6 +139,7 @@ export default Vue.extend({
   @apply m-1;
   @apply rounded-full;
   @apply tracking-widest;
+  box-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5) inset;
 }
 .btn:hover:not(:disabled),
 .btn:focus:not(:disabled) {
@@ -156,6 +157,8 @@ export default Vue.extend({
 .watch {
   @apply border border-paint-blue;
   @apply text-paint-blue;
+  @apply bg-paint-blue;
+  --bg-opacity: 0.15;
 }
 .watch:hover:not(:disabled),
 .watch:focus:not(:disabled) {
@@ -165,6 +168,8 @@ export default Vue.extend({
 .join {
   @apply border border-paint-red;
   @apply text-paint-red;
+  @apply bg-paint-red;
+  --bg-opacity: 0.15;
 }
 .join:hover:not(:disabled),
 .join:focus:not(:disabled) {

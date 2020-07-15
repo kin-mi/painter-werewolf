@@ -41,18 +41,18 @@ html {
 }
 
 .body {
-  background-position: 0px 0px, 24px 24px;
-  background-size: 48px 48px;
+  background-position: 0px 0px;
+  background-size: 600px 400px;
   background-color: #fff5e0;
-  background-image: url('/images/symbol_pen.svg');
-  animation: bg-slide 5s linear infinite;
+  background-image: url('/images/bg.svg');
+  animation: bg-slide 25s linear infinite;
 }
 @keyframes bg-slide {
   0% {
-    background-position: 0px 0px, 48px 48px;
+    background-position: 0px 0px, 600px 400px;
   }
   100% {
-    background-position: -48px -48px, 0px 0px;
+    background-position: -600px -400px, 0px 0px;
   }
 }
 

@@ -19,6 +19,7 @@ type InjectTypeRoom = {
   watch(roomId: string): Promise<void>
   exit(roomId: string): Promise<void>
   close(roomId: string): Promise<void>
+  getRoomStatus(roomId: string): Promise<RoomStatus | undefined>
   attachRoom(roomId: string): void
   detachRoom(): void
   attachList(): void
@@ -141,24 +142,52 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    * @param {string} roomId
    */
   async function join(roomId: string): Promise<void> {
-    const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
-    const roomDoc = await roomDocRef.get()
-    if (!roomDoc.exists) return
-
     const user = ctx.app.$accessor.auth.user
-    const room = dataToRoom(roomDoc.data()!)
-    const userPayload = {
-      id: user.id,
-      playerName: user.playerName,
-      status: 'online',
-      color: _findNextColor(room),
-    } as RoomUser
 
-    const currentRoom = await _updateUserStatus(roomDocRef, userPayload)
+    // Start transaction.
+    let room: Room
+    await ctx.app.$fireStore
+      .runTransaction(async (trn) => {
+        const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
+        // 現在の部屋情報を取得
+        const roomSnap = await trn.get(roomDocRef)
+        if (!roomSnap.exists)
+          throw new Error(`Not found room. ${roomDocRef.id}`)
+        room = dataToRoom(roomSnap.data()!)
 
-    // set current room
-    state.currentRoom = currentRoom!
+        const userPayload = {
+          id: user.id,
+          playerName: user.playerName,
+          status: 'online',
+          color: _findNextColor(room),
+        } as RoomUser
+
+        const playersIdx = room.players.findIndex((id) => id === user.id)
+        if (playersIdx === -1) {
+          // ユーザーリスト存在しない場合（新規）
+          room.playersStatus.push(userPayload)
+          room.players.push(user.id)
+        } else {
+          // 存在する場合（再入室）
+          const playersStatusIdx = room.playersStatus.findIndex(
+            (e) => e.id === user.id
+          )
+          room.playersStatus.splice(playersStatusIdx, 1, userPayload)
+        }
+        return trn.update(roomDocRef, {
+          players: room.players,
+          playersStatus: room.playersStatus,
+          updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+        } as Room)
+      })
+      .then(() => {
+        // set current room
+        if (room) {
+          state.currentRoom = room
+        }
+      })
   }
+
   // 次の色を探す
   function _findNextColor(room: Room): UserColors {
     const alreadyExistsColors = room.playersStatus
@@ -168,22 +197,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
       Object.values(UserColors).find((e) => !alreadyExistsColors.includes(e)) ||
       UserColors.black
     )
-  }
-
-  /******************************
-   * 再度入室する時の処理
-   * @param {string} uid
-   */
-  async function reJoin(uid: string): Promise<void> {
-    const roomCollectionRef = ctx.app.$fireStore
-      .collection('rooms' as CollectionName)
-      .where('players', 'array-contains', uid)
-      .where('status', '==', 'play' as RoomStatus)
-      .limit(1)
-    const roomSnap = await roomCollectionRef.get()
-    if (roomSnap.empty) throw new Error('Not joined.')
-    const room = dataToRoom(roomSnap.docs[0].data())
-    state.currentRoom = room
   }
 
   /******************************
@@ -210,8 +223,37 @@ const RoomPlugin: Plugin = (ctx, inject) => {
 
     await _updateUserStatus(roomDocRef, userPayload)
 
-    // set current room
-    state.currentRoom = {} as Room
+    await ctx.app.$fireStore
+      .runTransaction(async (trn) => {
+        const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(roomId)
+        // 現在の部屋情報を取得
+        const roomSnap = await trn.get(roomDocRef)
+        if (!roomSnap.exists)
+          throw new Error(`Not found room. ${roomDocRef.id}`)
+        const room = dataToRoom(roomSnap.data()!)
+
+        const playersStatus = room.playersStatus.find((e) => e.id === user.id)
+        if (playersStatus) {
+          // ユーザーリスト存在する場合、退室
+          const userPayload = {
+            ...playersStatus,
+            status: 'exit',
+          } as RoomUser
+
+          const playersStatusIdx = room.playersStatus.findIndex(
+            (e) => e.id === user.id
+          )
+          room.playersStatus.splice(playersStatusIdx, 1, userPayload)
+          return trn.update(roomDocRef, {
+            playersStatus: room.playersStatus,
+            updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+          } as Room)
+        }
+      })
+      .then(() => {
+        // set current room
+        state.currentRoom = {} as Room
+      })
   }
 
   // 部屋にいるユーザーステータスを更新する
@@ -270,6 +312,36 @@ const RoomPlugin: Plugin = (ctx, inject) => {
       })
     // set current room
     state.currentRoom = {} as Room
+  }
+
+  /******************************
+   * 再度入室する時の処理
+   * @param {string} uid
+   */
+  async function reJoin(uid: string): Promise<void> {
+    const roomCollectionRef = ctx.app.$fireStore
+      .collection('rooms' as CollectionName)
+      .where('players', 'array-contains', uid)
+      .where('status', 'in', ['play', 'wait'] as RoomStatus[])
+      .limit(1)
+    const roomSnap = await roomCollectionRef.get()
+    if (roomSnap.empty) throw new Error('Not joined.')
+    const room = dataToRoom(roomSnap.docs[0].data())
+    state.currentRoom = room
+  }
+
+  /******************************
+   * 指定したIDの部屋ステータスを取得する
+   * @param {string} roomId
+   */
+  async function getRoomStatus(
+    roomId: string
+  ): Promise<RoomStatus | undefined> {
+    // exists room check
+    const doc = await ctx.app.$fireStore.collection('rooms').doc(roomId).get()
+    if (!doc.exists) return undefined
+
+    return doc.data()!.status as RoomStatus
   }
 
   let _roomConnection: () => void | undefined
@@ -377,6 +449,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     reJoin,
     exit,
     close,
+    getRoomStatus,
     attachRoom,
     detachRoom,
     attachList,

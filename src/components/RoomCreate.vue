@@ -73,7 +73,7 @@
                 ターン数
               </label>
               <input
-                id="trun"
+                id="turn"
                 v-model="roomConfig.round"
                 class="modal-form-part"
                 type="number"
@@ -266,23 +266,35 @@ export default Vue.extend({
 .modal-body {
   @apply w-full max-w-sm flex flex-col;
 }
+
 .modal-form-label {
   @apply pt-2 text-sm text-paint-brown;
 }
-.modal-form-part {
-  @apply w-56 border-b text-left text-paint-brown font-bold px-2 py-1 bg-base-dark bg-opacity-50 rounded-t-sm border-paint-brown;
+.modal-form-label[for='message'] {
+  @apply text-red-800;
 }
+
+.modal-form-part {
+  @apply w-56;
+  @apply px-2 py-1;
+  @apply border-b border-paint-brown rounded-t-sm;
+  @apply text-left text-paint-brown font-bold;
+  @apply bg-base-dark bg-opacity-50;
+}
+.modal-form-part:focus {
+  @apply outline-none;
+  box-shadow: 0 0 0 3px rgba(198, 153, 159, 0.5);
+}
+
 .modal-form-part[type='number'] {
   @apply w-12;
 }
 .modal-form-part[type='checkbox'] {
   @apply w-auto;
 }
-.modal-form-label[for='message'] {
-  @apply text-red-800;
-}
 .modal-form-part#message {
-  @apply w-full text-red-900 bg-red-800 bg-opacity-25;
+  @apply w-full outline-none text-red-900 bg-opacity-25;
+  background-color: rgba(198, 153, 159, var(--bg-opacity));
 }
 
 .modal-enter-active,
