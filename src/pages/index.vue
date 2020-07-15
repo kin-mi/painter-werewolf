@@ -14,7 +14,12 @@
       @input="setName"
       @selected="setIcon"
     />
-    <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
+    <LoginButton
+      class="w-full mt-3"
+      :is-disabled="!$accessor.auth.isReady || !displayName"
+      @click="login"
+      >ロビーへ入る</LoginButton
+    >
     <RuleDescription class="w-full mt-5" />
     <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
     <Copyright />

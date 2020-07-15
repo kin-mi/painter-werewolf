@@ -43,7 +43,7 @@ html {
 .body {
   background-position: 0px 0px;
   background-size: 600px 400px;
-  background-color: #fff5e0;
+  background-color: #eaeaea;
   background-image: url('/images/bg.svg');
   animation: bg-slide 25s linear infinite;
 }
