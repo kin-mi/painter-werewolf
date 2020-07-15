@@ -43,16 +43,16 @@ html {
 .body {
   background-position: 0px 0px;
   background-size: 600px 400px;
-  background-color: #eaeaea;
+  background-color: #fff5e0;
   background-image: url('/images/bg.svg');
   animation: bg-slide 25s linear infinite;
 }
 @keyframes bg-slide {
   0% {
-    background-position: 0px 0px, 600px 400px;
+    background-position: 0px 0px;
   }
   100% {
-    background-position: -600px -400px, 0px 0px;
+    background-position: -400px -400px;
   }
 }
 
