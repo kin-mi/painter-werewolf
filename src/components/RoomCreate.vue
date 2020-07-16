@@ -225,10 +225,6 @@ export default Vue.extend({
   @apply font-bold;
 }
 
-.material-design-icon svg {
-  @apply inline-block;
-}
-
 .modal {
   @apply z-20;
   @apply fixed w-full h-full top-0 left-0;

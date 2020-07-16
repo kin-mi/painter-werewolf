@@ -7,7 +7,7 @@ import { DrawStatus, CollectionName } from '~/utils/constant'
 type InjectTypeCanvas = {
   drawStatus: DrawStatus
   loadedTurn: number
-  mount(container: HTMLDivElement, color: string): void
+  mount(container: HTMLDivElement, color: string): Promise<void>
   postLine(roomId: string, playId: string): Promise<void>
   loadLine(data: firestore.DocumentData): Promise<void>
 }
@@ -94,7 +94,10 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
    * @param {HTMLDivElement} container
    * @param {string} color
    */
-  function mount(container: HTMLDivElement, color: string): void {
+  async function mount(
+    container: HTMLDivElement,
+    color: string
+  ): Promise<void> {
     _stage = new Konva.Stage({
       id: 'stage',
       container,
@@ -104,13 +107,21 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     })
     _layer = new Layer()
     _stage.add(_layer)
-    _bgImage = new Konva.Image({
-      width: container.clientWidth,
-      height: container.clientHeight,
-      fill: 'white',
-      image: undefined,
+    _bgImage = await new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const image = new Konva.Image({
+          width: container.clientWidth,
+          height: container.clientHeight,
+          fill: 'white',
+          image: img,
+        })
+        resolve(image)
+      }
+      img.onerror = (e) => reject(e)
+      img.src = '/images/bg-canvas.png'
     })
-    _layer.add(_bgImage)
+    if (_bgImage) _layer.add(_bgImage)
     _stage.draw()
     _stage.on('mousedown touchstart', _mousedown)
     _stage.on('mouseup touchend', _mouseup)

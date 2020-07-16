@@ -1,19 +1,12 @@
 <template>
   <div>
     <PlayerList />
-    <h2>{{ room.message }}</h2>
-    <h3>待機中のユーザー：{{ onlineUsers.length }}人</h3>
-    <ol class="list-none">
-      <li
-        v-for="user in onlineUsers"
-        :key="user.id"
-        class="font-bold text-gr"
-        :style="{ color: user.color }"
-      >
-        {{ user.playerName }}
-      </li>
-    </ol>
-    <div class="flex items-center justify-center">
+    <!-- <h2>{{ room.message }}</h2> -->
+    <h3 v-if="room.watch" class="mx-auto text-right" style="width: 350px;">
+      <eye-icon :size="20" />：{{ watchUsers.length }}人
+    </h3>
+    <PlayDrawStage />
+    <div class="flex items-center justify-center" style="margin-top: -100px;">
       <button
         v-if="isOwner"
         style="width: 104px; height: 36px; font-size: 13px;"
@@ -48,10 +41,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import PlayerList from '~/components/PlayerList.vue'
+import PlayDrawStage from '~/components/PlayDrawStage.vue'
 import { Room, RoomUser } from '~/plugins/room'
 export default Vue.extend({
   components: {
     PlayerList,
+    PlayDrawStage,
   },
   computed: {
     room(): Room {
@@ -59,6 +54,9 @@ export default Vue.extend({
     },
     onlineUsers(): RoomUser[] {
       return this.room.playersStatus.filter((e) => e.status === 'online')
+    },
+    watchUsers(): RoomUser[] {
+      return this.room.watchers.filter((e) => e.status === 'online')
     },
     isOwner(): boolean {
       return (

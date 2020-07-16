@@ -23,7 +23,7 @@
     <!-- ROOM -->
     <template v-else>
       <div class="room-container">
-        <Room />
+        <Room class="w-full" />
       </div>
     </template>
   </div>
@@ -85,7 +85,6 @@ export default Vue.extend({
 .header {
   @apply w-full h-auto;
   @apply mx-auto;
-  @apply transition-size duration-500;
 }
 
 .header .wrap {
@@ -99,7 +98,7 @@ export default Vue.extend({
 
 .room-container {
   @apply flex flex-wrap content-start justify-center items-start;
-  @apply w-10/12 max-w-lg;
+  @apply w-full max-w-2xl;
   min-height: 95vh;
   @apply mx-auto;
   @apply text-center;

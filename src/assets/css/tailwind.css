@@ -47,3 +47,7 @@ html, body {
 .marker {
   background:linear-gradient(transparent 70%, #C6999F 70%);
 }
+
+.material-design-icon svg {
+  @apply inline-block;
+}

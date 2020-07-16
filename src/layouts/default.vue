@@ -3,7 +3,7 @@
     <transition name="page">
       <nuxt class="flex-grow flex-1" />
     </transition>
-    <transition name="bottom">
+    <transition name="bottom-up">
       <Messenger v-if="isMessengerOpen" />
     </transition>
   </div>
@@ -53,7 +53,7 @@ html {
     background-position: 0px 0px;
   }
   100% {
-    background-position: -400px -400px;
+    background-position: -600px -400px;
   }
 }
 
@@ -82,14 +82,14 @@ html {
   opacity: 0;
 }
 
-.bottom-enter-active,
-.bottom-leave-active {
+.bottom-up-enter-active,
+.bottom-up-leave-active {
   transform: translate(0px, 0px);
   transition: transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
 }
 
-.bottom-enter,
-.bottom-leave-to {
+.bottom-up-enter,
+.bottom-up-leave-to {
   transform: translateY(100vh) translateY(0px);
 }
 </style>

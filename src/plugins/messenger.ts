@@ -30,6 +30,7 @@ export type MessageFor = 'all' | 'paiter' | 'werewolf'
 export type Message = {
   id: string
   playerName: string
+  icon: string
   color: string
   body: string
   target: MessageFor
@@ -95,6 +96,7 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
     const msg = {
       id: ctx.app.$accessor.auth.user.id,
       playerName: ctx.app.$accessor.auth.user.playerName,
+      icon: ctx.app.$accessor.auth.user.photoURL,
       color:
         ctx.$room.info.playersStatus.find((e) => {
           return e.id === ctx.app.$accessor.auth.user.id

@@ -1,14 +1,6 @@
 <template>
   <div class="fixed bottom-0 w-full">
-    <div
-      ref="messageWrapper"
-      class="overflow-auto max-w-md h-screen-1/5 mt-2 mx-auto bg-gray-200 border border-green-800 rounded-md shadow"
-    >
-      <!-- <transition-group name="chat" tag="div" class="flex flex-col justify-end">
-        <template v-for="(message, index) in messageList">
-          <MessengerCard :key="index" :message="message" />
-        </template>
-      </transition-group> -->
+    <div ref="messageWrapper" class="chat-wrapper">
       <template v-for="(message, index) in messageList">
         <MessengerCard :key="index" :message="message" />
       </template>
@@ -83,14 +75,10 @@ export default Vue.extend({
 })
 </script>
 <style scoped>
-.chat-move {
-  transition: all 0.8s ease;
-}
-.chat-enter {
-  transform: translateY(50px);
-  opacity: 0;
-}
-.chat-enter-active {
-  transition: all 0.8s ease;
+.chat-wrapper {
+  @apply relative bg-gray-200 border border-green-800 rounded-md shadow;
+  @apply max-w-md mt-2 mx-auto;
+  @apply overflow-auto;
+  height: 10vh;
 }
 </style>

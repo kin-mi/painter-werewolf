@@ -31,21 +31,6 @@ module.exports = {
           black: '#221714',
         },
       },
-      height: {
-        '11/12': '91.666667%',
-        'screen-1/5': '20vh',
-      },
-      maxHeight: {
-        '0': '0',
-        'screen-1/5': '20vh',
-      },
-      minHeight: {
-        '0': '0',
-        'screen-1/5': '20vh',
-      },
-      transitionProperty: {
-        size: 'height, width',
-      },
     },
   },
   variants: {},
