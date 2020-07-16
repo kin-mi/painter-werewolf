@@ -1,38 +1,17 @@
 <template>
   <div>
     <PlayerList />
-    <!-- <h2>{{ room.message }}</h2> -->
-    <h3 v-if="room.watch" class="mx-auto text-right" style="width: 350px;">
-      <eye-icon :size="20" />：{{ watchUsers.length }}人
-    </h3>
-    <PlayDrawStage />
+    <PlayDrawStage class="mt-2" />
     <div class="flex items-center justify-center" style="margin-top: -100px;">
-      <button
-        v-if="isOwner"
-        style="width: 104px; height: 36px; font-size: 13px;"
-        class="hover:opacity-75 btn-primary mr-2"
-        type="button"
-        @click="closeRoom"
-      >
+      <button v-if="isOwner" class="btn exit" type="button" @click="closeRoom">
         部屋を閉じる
       </button>
-      <button
-        style="width: 104px; height: 36px; font-size: 13px;"
-        class="hover:opacity-75 btn-primary"
-        type="button"
-        @click="exitRoom"
-      >
+      <button class="btn exit" type="button" @click="exitRoom">
         退出する
       </button>
     </div>
     <div class="flex items-center justify-center mt-2">
-      <button
-        v-if="isOwner"
-        style="width: 104px; height: 36px; font-size: 13px;"
-        class="hover:opacity-75 btn-primary"
-        type="button"
-        @click="playStart"
-      >
+      <button v-if="isOwner" class="btn start" type="button" @click="playStart">
         ゲーム開始
       </button>
     </div>
@@ -95,3 +74,48 @@ export default Vue.extend({
   },
 })
 </script>
+<style scoped>
+.btn {
+  @apply relative;
+  @apply inline-flex items-center justify-center;
+  @apply w-32;
+  @apply m-1;
+  @apply rounded-full;
+  @apply tracking-widest;
+  box-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5) inset;
+}
+.btn:hover:not(:disabled),
+.btn:focus:not(:disabled) {
+  @apply transition-colors duration-300;
+  @apply outline-none;
+  @apply text-base-light;
+}
+.btn:disabled {
+  @apply cursor-default;
+  @apply text-base-light;
+  @apply border border-gray-500;
+  @apply bg-paint-gray;
+}
+
+.exit {
+  @apply border border-paint-blue;
+  @apply text-paint-blue;
+  @apply bg-paint-blue;
+  --bg-opacity: 0.15;
+}
+.exit:hover:not(:disabled),
+.exit:focus:not(:disabled) {
+  @apply bg-paint-blue;
+}
+
+.start {
+  @apply border border-paint-red;
+  @apply text-paint-red;
+  @apply bg-paint-red;
+  --bg-opacity: 0.15;
+}
+.start:hover:not(:disabled),
+.start:focus:not(:disabled) {
+  @apply bg-paint-red;
+}
+</style>

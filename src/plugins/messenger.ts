@@ -125,6 +125,7 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
     const msg = {
       id: 'SYSTEM',
       playerName: 'ゲームマスター',
+      icon: 'icon_gm.png',
       color: '#674129',
       body: params.body,
       target,

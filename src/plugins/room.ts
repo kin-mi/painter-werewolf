@@ -271,7 +271,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     const roomCollectionRef = ctx.app.$fireStore
       .collection('rooms' as CollectionName)
       .where('players', 'array-contains', uid)
-      .where('status', 'in', ['play', 'wait'] as RoomStatus[])
+      .where('status', '==', 'wait' as RoomStatus)
       .limit(1)
     const roomSnap = await roomCollectionRef.get()
     if (roomSnap.empty) throw new Error('Not joined.')

@@ -3,7 +3,7 @@ import { Plugin } from '@nuxt/types'
 import { v4 as uuid } from 'uuid'
 import { firestore } from 'firebase'
 import { RoomUser, dataToRoom } from './room'
-import { CollectionName } from '~/utils/constant'
+import { CollectionName, RoomStatus } from '~/utils/constant'
 import { shuffle } from '~/utils/array'
 import { ThemeMap } from '~/utils/theme'
 import { SystemMessage } from '~/utils/message'
@@ -15,9 +15,11 @@ type InjectTypeGM = {
   isGameFinished: boolean
   start(roomId: string): Promise<void>
   init(roomId: string): Promise<void>
+  reJoin(uid: string): Promise<void>
   next(roomId: string): Promise<void>
   acceptVote(roomId: string, voteResult: string): Promise<void>
   close(roomId: string): Promise<void>
+  initialize(): void
   attachPlayground(roomId: string, playId: string): void
   detachPlayground(): void
   attachLineList(roomId: string, playId: string): void
@@ -81,6 +83,11 @@ type State = {
   isRoundFinished: boolean
   isGameFinished: boolean
 }
+const initialState = {
+  playground: undefined,
+  isRoundFinished: false,
+  isGameFinished: false,
+} as State
 
 /**********************************************
  * ゲーム管理用プラグイン
@@ -92,10 +99,13 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
    * Observable properties
    */
   const state = Vue.observable({
-    playground: undefined,
-    isRoundFinished: false,
-    isGameFinished: false,
+    ...initialState,
   } as State)
+  function _stateInit(): void {
+    state.playground = initialState.playground
+    state.isGameFinished = initialState.isGameFinished
+    state.isRoundFinished = initialState.isRoundFinished
+  }
 
   /******************************
    * ゲーム開始
@@ -166,6 +176,7 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
    * @param {string} roomId
    */
   async function init(roomId: string): Promise<void> {
+    _stateInit()
     const playgroundCollectionRef = ctx.app.$fireStore
       .collection('rooms' as CollectionName)
       .doc(roomId)
@@ -215,6 +226,31 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
         'all'
       )
     }
+  }
+
+  /******************************
+   * 再度入室する時の処理
+   * @param {string} uid
+   */
+  async function reJoin(uid: string): Promise<void> {
+    // 自身が参加している遊戯中の部屋を検索
+    const roomCollectionRef = ctx.app.$fireStore
+      .collection('rooms' as CollectionName)
+      .where('players', 'array-contains', uid)
+      .where('status', '==', 'play' as RoomStatus)
+      .limit(1)
+    const roomSnap = await roomCollectionRef.get()
+    if (roomSnap.empty) throw new Error('Not joined.')
+    const room = dataToRoom(roomSnap.docs[0].data())
+    ctx.$room.info = room
+    // 存在する場合、プレイグラウンドを取得
+    const playgroundRef = roomSnap.docs[0].ref.collection(
+      'playground' as CollectionName
+    )
+    const playgroundSnap = await playgroundRef.get()
+    if (playgroundSnap.empty) throw new Error('Not joined.')
+    const playground = dataToPlayground(playgroundSnap.docs[0].data())
+    state.playground = playground
   }
 
   /******************************
@@ -410,6 +446,7 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
    */
   function detachPlayground(): void {
     if (_playgroundConnection) _playgroundConnection()
+    state.playground = undefined
   }
 
   let _lineListConnection: () => void | undefined
@@ -468,6 +505,7 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
     },
     start,
     init,
+    reJoin,
     next,
     acceptVote,
     close,

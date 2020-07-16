@@ -78,8 +78,8 @@ export default Vue.extend({
 .chat-wrapper {
   @apply relative;
   @apply max-w-md mt-2 mx-auto;
-  height: 10vh;
+  height: 12vh;
   @apply overflow-auto;
-  @apply bg-gray-200 border border-green-800 rounded-md shadow;
+  @apply bg-white bg-opacity-50 border-t border-green-800 rounded-t-sm shadow;
 }
 </style>

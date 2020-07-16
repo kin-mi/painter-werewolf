@@ -1,17 +1,28 @@
 <template>
   <div class="stage-container">
+    <!-- {{ $canvas.drawStatus }} -->
     <div ref="stage" class="w-full h-full" />
-    <PlayDrawStageFilter class="stage-filter" />
+    <PlayDrawStageFilter class="stage-filter" :mode="filterMode" />
   </div>
 </template>
 <script lang="ts">
 import Vue from 'vue'
-import PlayDrawStageFilter from '~/components/PlayDrawStageFilter.vue'
+import PlayDrawStageFilter, { MODE } from '~/components/PlayDrawStageFilter.vue'
 import { UserColors, DrawStatus } from '~/utils/constant'
-import { Playground } from '~/plugins/gameManager'
 export default Vue.extend({
   components: {
     PlayDrawStageFilter,
+  },
+  computed: {
+    filterMode(): MODE {
+      return this.$room.info.status === 'wait'
+        ? 'stanby'
+        : this.$gm.isMyTurn
+        ? 'myTurn'
+        : this.$gm.playground.currentTurn.painter !== ''
+        ? 'otherTurn'
+        : 'none'
+    },
   },
   watch: {
     // "stop" => isMyTrun => "start" => Drawing => "finish" => "stop"
@@ -21,18 +32,8 @@ export default Vue.extend({
       }
     },
     '$gm.isMyTurn'(n: boolean, o: boolean) {
-      if (n && !o && this.$canvas.drawStatus === 'stop')
+      if (n && !o && this.$canvas.drawStatus === 'stop') {
         this.$canvas.drawStatus = 'start'
-    },
-    '$gm.playground'(n: Playground, o: Playground) {
-      if (n && !o) {
-        this.$nextTick(() => {
-          const color =
-            this.$gm.playground!.players.find(
-              (e) => e.id === this.$accessor.auth.user.id
-            )?.color || UserColors.black
-          this.$canvas.mount(this.$refs.stage as HTMLDivElement, color)
-        })
       }
     },
   },
@@ -55,7 +56,7 @@ export default Vue.extend({
   height: 400px;
   background-image: url('/images/bg-canvas.png');
   background-size: cover;
-  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
 }
 .stage-filter {
   @apply absolute top-0 left-0;

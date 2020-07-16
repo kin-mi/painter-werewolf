@@ -9,6 +9,7 @@
     <LoginForm
       ref="loginForm"
       class="w-full"
+      v-bind="$accessor.auth.user"
       :display-name.sync="displayName"
       :selected-icon.sync="selectedIcon"
       @input="setName"

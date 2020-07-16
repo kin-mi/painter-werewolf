@@ -136,7 +136,7 @@ export default Vue.extend({
       .then(async () => {
         // 認証済みの場合、入室済みの部屋へ入室
         if (!Object.keys(app.$room.info).length)
-          await app.$room.reJoin(app.$accessor.auth.user.id).catch(() => {
+          await app.$gm.reJoin(app.$accessor.auth.user.id).catch(() => {
             // 入室済みの部屋が無い場合
             redirect('/lobby')
           })
@@ -152,6 +152,10 @@ export default Vue.extend({
     await this.$gm.init(this.$room.info.id)
     this.$gm.attachPlayground(this.$room.info.id, this.$gm.playground!.id)
     this.$gm.attachLineList(this.$room.info.id, this.$gm.playground!.id)
+  },
+  beforeDestroy() {
+    this.$gm.detachPlayground()
+    this.$gm.detachLineList()
   },
 })
 </script>
