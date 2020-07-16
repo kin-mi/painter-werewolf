@@ -122,9 +122,6 @@ export default Vue.extend({
 .card-details {
   @apply w-auto h-auto mx-2 border-b border-dashed border-gray-400 text-paint-brown text-sm;
 }
-.material-design-icon svg {
-  @apply inline-block;
-}
 .card-message {
   @apply w-auto h-auto my-1 mx-2 pb-1 border border-paint-brown rounded-md;
   /* box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3); */
