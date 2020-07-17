@@ -1,9 +1,17 @@
 <template>
   <div class="fixed bottom-0 w-full">
-    <div ref="messageWrapper" class="chat-wrapper">
+    <div
+      ref="messageWrapper"
+      class="chat-wrapper"
+      :class="collapse ? 'collapse' : 'expand'"
+    >
       <template v-for="(message, index) in messageList">
         <MessengerCard :key="index" :message="message" />
       </template>
+      <div class="collapseBtn" @click="collapse = !collapse">
+        <arrow-expand v-if="collapse" />
+        <arrow-collapse v-else />
+      </div>
     </div>
     <div
       class="max-w-md flex mt-1 my-4 mb-1 rounded-lg border-2 border-green-800 overflow-hidden mx-auto"
@@ -31,9 +39,10 @@ export default Vue.extend({
   components: {
     MessengerCard,
   },
-  data() {
+  data(): { messageBody: string; collapse: boolean } {
     return {
       messageBody: '',
+      collapse: true,
     }
   },
   computed: {
@@ -78,8 +87,18 @@ export default Vue.extend({
 .chat-wrapper {
   @apply relative;
   @apply max-w-md mt-2 mx-auto;
-  height: 12vh;
+  min-height: 12vh;
   @apply overflow-auto;
   @apply bg-white bg-opacity-50 border-t border-green-800 rounded-t-sm shadow;
+}
+.collapse {
+  height: 12vh;
+}
+.expand {
+  height: auto;
+  max-height: 40vh;
+}
+.collapseBtn {
+  @apply absolute top-0 right-0 mr-1 text-gray-800 cursor-pointer;
 }
 </style>
