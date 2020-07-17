@@ -16,7 +16,9 @@
           $dayjs(message.createAt).format('HH:MM')
         }}</span>
       </div>
-      <p class="w-full mt-1 font-light text-gray-800 leading-4 break-words">
+      <p
+        class="w-full mt-1 pr-3 font-light text-gray-800 leading-4 break-words"
+      >
         {{ message.body }}
       </p>
     </div>
