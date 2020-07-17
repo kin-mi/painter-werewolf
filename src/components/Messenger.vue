@@ -1,13 +1,11 @@
 <template>
   <div class="fixed bottom-0 w-full">
-    <div
-      ref="messageWrapper"
-      class="chat-wrapper"
-      :class="collapse ? 'collapse' : 'expand'"
-    >
-      <template v-for="(message, index) in messageList">
-        <MessengerCard :key="index" :message="message" />
-      </template>
+    <div class="chat-wrapper" :class="collapse ? 'collapse' : 'expand'">
+      <div ref="messageWrapper" class="chat-area">
+        <template v-for="(message, index) in messageList">
+          <MessengerCard :key="index" :message="message" />
+        </template>
+      </div>
       <div class="collapseBtn" @click="collapse = !collapse">
         <arrow-expand v-if="collapse" />
         <arrow-collapse v-else />
@@ -88,6 +86,10 @@ export default Vue.extend({
   @apply relative;
   @apply max-w-md mt-2 mx-auto;
   min-height: 12vh;
+}
+.chat-area {
+  @apply w-auto h-full;
+  max-height: 40vh;
   @apply overflow-auto;
   @apply bg-white bg-opacity-50 border-t border-green-800 rounded-t-sm shadow;
 }
