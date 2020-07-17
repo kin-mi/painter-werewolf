@@ -8,7 +8,7 @@
     <div class="flex flex-col">
       <div class="flex items-end leading-3 pt-1">
         <span
-          class="font-bold text-md mr-2 font-sans"
+          class="font-bold text-sm mr-2 font-sans"
           :style="{ color: message.color }"
           >{{ message.playerName }}</span
         >
@@ -16,7 +16,7 @@
           $dayjs(message.createAt).format('HH:MM')
         }}</span>
       </div>
-      <p class="w-full font-light text-md text-gray-800 break-words">
+      <p class="w-full mt-1 font-light text-gray-800 leading-4 break-words">
         {{ message.body }}
       </p>
     </div>
