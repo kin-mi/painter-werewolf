@@ -17,7 +17,7 @@
         }}</span>
       </div>
       <p
-        class="w-full mt-1 pr-3 font-light text-gray-800 leading-4 break-words"
+        class="w-full mt-1 pr-6 font-light text-gray-800 leading-4 break-words"
       >
         {{ message.body }}
       </p>

@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <PlayDrawStage />
+    <PlayerList />
+    <PlayDrawStage class="mt-2" />
     <template v-if="$gm.isRoundFinished">
       <PlayVoteModalForPainter v-if="!isWerewolf" />
       <PlayVoteModalForWolf v-else />
@@ -22,6 +23,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { SystemMessage } from '../utils/message'
+import PlayerList from '~/components/PlayerList.vue'
 import PlayDrawStage from '~/components/PlayDrawStage.vue'
 import PlayVoteModalForPainter from '~/components/PlayVoteModalForPainter.vue'
 import PlayVoteModalForWolf from '~/components/PlayVoteModalForWolf.vue'
@@ -37,6 +39,7 @@ type CanvasHandler = {
 }
 export default Vue.extend({
   components: {
+    PlayerList,
     PlayDrawStage,
     PlayVoteModalForPainter,
     PlayVoteModalForWolf,
@@ -55,6 +58,7 @@ export default Vue.extend({
       return this.currentTurn?.painter === ''
     },
     isGameFinished(): boolean {
+      if (!this.$gm.playground) return false
       return this.$gm.playground?.result !== ''
     },
     user(): User {
@@ -161,7 +165,7 @@ export default Vue.extend({
 </script>
 <style>
 .container {
-  @apply flex flex-wrap content-start justify-center items-start text-center mx-auto bg-base;
+  @apply flex flex-wrap content-start justify-center items-start text-center mx-auto;
 }
 
 .title {

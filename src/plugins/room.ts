@@ -318,8 +318,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     if (_roomConnection) _roomConnection()
   }
 
-  let _waitRoomListConnection: () => void | undefined
-  let _playRoomListConnection: () => void | undefined
+  let _roomListConnection: () => void | undefined
   /******************************
    * 部屋の一覧をアタッチする
    * @param {string} roomId
@@ -328,18 +327,9 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     // detachList()
 
     // 待機ステータスの部屋一覧
-    _waitRoomListConnection = ctx.app.$fireStore
+    _roomListConnection = ctx.app.$fireStore
       .collection('rooms' as CollectionName)
-      .where('status', '==', 'wait' as RoomStatus)
-      .onSnapshot((snap) => {
-        snap.docChanges().forEach((change) => {
-          _setRoomList(change)
-        })
-      })
-    // 遊戯中ステータスの部屋一覧
-    _playRoomListConnection = ctx.app.$fireStore
-      .collection('rooms' as CollectionName)
-      .where('status', '==', 'play' as RoomStatus)
+      .where('status', 'in', ['wait', 'play'] as RoomStatus[])
       .onSnapshot((snap) => {
         snap.docChanges().forEach((change) => {
           _setRoomList(change)
@@ -350,8 +340,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    * 部屋の一覧をデタッチする
    */
   function detachList(): void {
-    if (_waitRoomListConnection) _waitRoomListConnection()
-    if (_playRoomListConnection) _playRoomListConnection()
+    if (_roomListConnection) _roomListConnection()
   }
   const _setRoomList = (change: firebase.firestore.DocumentChange): void => {
     const data = change.doc.data() as Room
@@ -371,13 +360,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
         state.list.splice(idx, 1)
         break
     }
-    state.list.sort((a, b) => {
-      if (!a.createAt) return 1
-      else if (!b.createAt) return -1
-      const dateA = 'getTime' in a.createAt ? a.createAt.getTime() : 0
-      const dateB = 'getTime' in b.createAt ? b.createAt?.getTime() : 0
-      return dateB - dateA
-    })
   }
 
   /**

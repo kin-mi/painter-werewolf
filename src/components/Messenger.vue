@@ -101,6 +101,6 @@ export default Vue.extend({
   max-height: 40vh;
 }
 .collapseBtn {
-  @apply absolute top-0 right-0 mr-1 text-gray-800 cursor-pointer;
+  @apply absolute top-0 right-0 mr-1 text-green-800 cursor-pointer;
 }
 </style>

@@ -19,7 +19,7 @@ export default Vue.extend({
         ? 'stanby'
         : this.$gm.isMyTurn
         ? 'myTurn'
-        : this.$gm.playground.currentTurn.painter !== ''
+        : this.$gm.playground && this.$gm.playground.currentTurn.painter !== ''
         ? 'otherTurn'
         : 'none'
     },

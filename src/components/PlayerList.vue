@@ -4,7 +4,7 @@
       v-for="user in onlineUsers"
       :key="user.id"
       class="list-wrapper"
-      :class="cardWidth"
+      :class="[cardWidth, user.id === currentUserId ? 'border-2' : 'border']"
       :style="{
         'border-color': user.color,
         'background-color': user.color + '40',
@@ -29,7 +29,16 @@ import { IconFileName } from '~/utils/constant'
 export default Vue.extend({
   computed: {
     onlineUsers(): RoomUser[] {
-      return this.$room.info.playersStatus.filter((e) => e.status === 'online')
+      if (this.$gm.playground) {
+        return this.$gm.playground.players.filter((e) => e.status === 'online')
+      } else {
+        return this.$room.info.playersStatus.filter(
+          (e) => e.status === 'online'
+        )
+      }
+    },
+    currentUserId(): string {
+      return this.$gm.playground?.currentTurn?.painter || ''
     },
     cardWidth(): string {
       return this.onlineUsers.length <= 3
@@ -54,7 +63,7 @@ export default Vue.extend({
 </script>
 <style scoped>
 .list-wrapper {
-  @apply h-auto mt-1 mr-1 pb-1 bg-white bg-opacity-50 border rounded-lg;
+  @apply h-auto mt-1 mr-1 pb-1 bg-white bg-opacity-50 rounded-lg;
   min-height: 2.15rem;
 }
 .list-wrapper:last-of-type {

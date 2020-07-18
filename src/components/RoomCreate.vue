@@ -40,7 +40,7 @@
             </div>
 
             <!--Body-->
-            <form class="modal-body">
+            <form class="modal-body" autocomplete="off">
               <label for="category" class="modal-form-label">
                 お題カテゴリ
               </label>

@@ -7,6 +7,8 @@ import { DrawStatus, CollectionName } from '~/utils/constant'
 type InjectTypeCanvas = {
   drawStatus: DrawStatus
   loadedTurn: number
+  isDrawing: boolean
+  lineColor: string
   mount(container: HTMLDivElement, color: string): Promise<void>
   postLine(roomId: string, playId: string): Promise<void>
   loadLine(data: firestore.DocumentData): Promise<void>
@@ -67,11 +69,12 @@ let _stage: Konva.Stage | undefined
 let _layer: Konva.Layer | undefined
 let _bgImage: Konva.Image | undefined
 let _lastLine: Konva.Line | undefined
-let _isDrawing: boolean = false
 
 type State = {
   drawStatus: DrawStatus
   loadedTurn: number
+  isDrawing: boolean
+  lineColor: string
 }
 
 class Layer extends Konva.Layer {}
@@ -87,6 +90,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
   const state = Vue.observable({
     drawStatus: 'stop',
     loadedTurn: 0,
+    isDrawing: false,
   } as State)
 
   /******************************
@@ -127,13 +131,16 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     _stage.on('mouseup touchend', _mouseup)
     _stage.on('mousemove touchmove', _mousemove)
 
-    lineConfig.stroke = color
+    // set user's line color
+    state.lineColor = color
+    lineConfig.stroke = state.lineColor
   }
 
   function _mousedown() {
-    if (!_stage || !_layer || _isDrawing || state.drawStatus !== 'start') return
+    if (!_stage || !_layer || state.isDrawing || state.drawStatus !== 'start')
+      return
     removeScrollEvent()
-    _isDrawing = true
+    state.isDrawing = true
     // 新規ラインの追加
     const pos = _stage.getPointerPosition()
     const scale = _stage.getAbsoluteScale()
@@ -144,14 +151,14 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
   }
 
   function _mouseup() {
-    if (!_isDrawing || !_lastLine) return
+    if (!state.isDrawing || !_lastLine) return
     undoScrollEvent()
-    _isDrawing = false
+    state.isDrawing = false
     state.drawStatus = 'finish'
   }
 
   function _mousemove() {
-    if (!_stage || !_layer || !_isDrawing || !_lastLine) return
+    if (!_stage || !_layer || !state.isDrawing || !_lastLine) return
     const pos = _stage.getPointerPosition()
     const scale = _stage.getAbsoluteScale()
     const newPoints = _lastLine
@@ -225,6 +232,12 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     },
     get loadedTurn() {
       return state.loadedTurn
+    },
+    get isDrawing() {
+      return state.isDrawing
+    },
+    get lineColor() {
+      return state.lineColor
     },
     mount,
     postLine,

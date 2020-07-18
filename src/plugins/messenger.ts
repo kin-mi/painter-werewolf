@@ -150,6 +150,7 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
       .collection('messages' as CollectionName)
       .where('target', '==', 'all')
       .orderBy('createAt')
+      .limitToLast(5)
       .onSnapshot({ includeMetadataChanges: true }, (snap) => {
         snap.docChanges().forEach((change) => {
           const data = change.doc.data()
@@ -161,9 +162,6 @@ const MessengerPlugin: Plugin = (ctx, inject) => {
               break
             case 'modified':
               state.messages.splice(idx, 1, msg)
-              break
-            case 'removed':
-              state.messages.splice(idx, 1)
               break
           }
         })

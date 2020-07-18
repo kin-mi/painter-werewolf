@@ -75,7 +75,7 @@ export default Vue.extend({
       } else {
         const user = this.$fireAuth.currentUser!
         if (user) {
-          user.updateProfile({
+          await user.updateProfile({
             displayName: this.displayName,
             photoURL: this.iconURL,
           })
@@ -83,9 +83,9 @@ export default Vue.extend({
         } else {
           await this.$fireAuth
             .signInAnonymously()
-            .then((result) => {
+            .then(async (result) => {
               if (result?.user !== null) {
-                result.user.updateProfile({
+                await result.user.updateProfile({
                   displayName: this.displayName,
                   photoURL: this.iconURL,
                 })
