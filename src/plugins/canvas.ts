@@ -92,6 +92,11 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     loadedTurn: 0,
     isDrawing: false,
   } as State)
+  function stateInitialize() {
+    state.drawStatus = 'stop'
+    state.loadedTurn = 0
+    state.isDrawing = false
+  }
 
   /******************************
    * ゲーム用Canvasをマウントする
@@ -102,6 +107,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
     container: HTMLDivElement,
     color: string
   ): Promise<void> {
+    stateInitialize()
     _stage = new Konva.Stage({
       id: 'stage',
       container,
