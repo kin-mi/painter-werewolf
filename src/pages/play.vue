@@ -12,7 +12,7 @@
           style="width: 104px; height: 26px; font-size: 6px;"
           class="mt-2 hover:opacity-75 btn-primary"
           type="button"
-          @click="$router.push('lobby')"
+          @click="$router.push('/lobby')"
         >
           ロビーへ戻る
         </button>

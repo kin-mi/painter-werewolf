@@ -50,7 +50,7 @@ export default Vue.extend({
       // オーナーによって部屋が閉じられたら強制退出
       if (n && n.status === 'close') this.$room.info = {} as Room
       // ゲーム開始
-      if (n && n.status === 'play') await this.$router.push('play')
+      if (n && n.status === 'play') await this.$router.push('/play')
     },
   },
   mounted() {
@@ -66,7 +66,7 @@ export default Vue.extend({
     },
     async playStart() {
       await this.$gm.start(this.room.id)
-      await this.$router.push('play')
+      await this.$router.push('/play')
     },
   },
 })

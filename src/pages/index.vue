@@ -95,7 +95,7 @@ export default Vue.extend({
             // eslint-disable-next-line no-console
             .catch((e) => console.error(e))
         }
-        this.$router.push('lobby')
+        this.$router.push('/lobby')
       }
     },
     setUser(user: firebase.User) {

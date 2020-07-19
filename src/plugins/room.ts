@@ -236,6 +236,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
         }
       })
       .then(() => {
+        detachRoom()
         // set current room
         state.currentRoom = {} as Room
       })
@@ -259,8 +260,11 @@ const RoomPlugin: Plugin = (ctx, inject) => {
         status: 'close' as RoomStatus,
         updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
       })
-    // set current room
-    state.currentRoom = {} as Room
+      .then(() => {
+        detachRoom()
+        // set current room
+        state.currentRoom = {} as Room
+      })
   }
 
   /******************************
