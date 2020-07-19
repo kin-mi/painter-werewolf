@@ -76,6 +76,12 @@ type State = {
   isDrawing: boolean
   lineColor: string
 }
+const initialState = {
+  drawStatus: 'stop',
+  loadedTurn: 0,
+  isDrawing: false,
+  lineColor: '#000',
+} as State
 
 class Layer extends Konva.Layer {}
 /**********************************************
@@ -88,14 +94,13 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
    * Observable properties
    */
   const state = Vue.observable({
-    drawStatus: 'stop',
-    loadedTurn: 0,
-    isDrawing: false,
+    ...initialState,
   } as State)
   function stateInitialize() {
-    state.drawStatus = 'stop'
-    state.loadedTurn = 0
-    state.isDrawing = false
+    state.drawStatus = initialState.drawStatus
+    state.loadedTurn = initialState.loadedTurn
+    state.isDrawing = initialState.isDrawing
+    state.lineColor = initialState.lineColor
   }
 
   /******************************
