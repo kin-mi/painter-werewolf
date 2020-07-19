@@ -243,6 +243,8 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
     if (roomSnap.empty) throw new Error('Not joined.')
     const room = dataToRoom(roomSnap.docs[0].data())
     ctx.$room.info = room
+    // 部屋情報をアタッチ
+    ctx.$room.attachRoom(room.id)
     // 存在する場合、プレイグラウンドを取得
     const playgroundRef = roomSnap.docs[0].ref.collection(
       'playground' as CollectionName

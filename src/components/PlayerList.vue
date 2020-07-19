@@ -64,6 +64,7 @@ export default Vue.extend({
 <style scoped>
 .list-wrapper {
   @apply h-auto mt-1 mr-1 pb-1 bg-white bg-opacity-50 rounded-lg;
+  max-width: 10rem;
   min-height: 2.15rem;
 }
 .list-wrapper:last-of-type {

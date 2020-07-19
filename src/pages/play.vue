@@ -77,12 +77,14 @@ export default Vue.extend({
     canvasHandler: {
       deep: true,
       handler(n: CanvasHandler, _o: CanvasHandler) {
+        console.log(n, _o)
         if (
           n.loadedTurn !== 0 &&
           n.loadedTurn === n.turn - 1 &&
           n.isMyTurn &&
           !n.isRoundFinished
         ) {
+          console.log('my turn')
           // my turn
           this.$messages.pushSystemMessage(
             {
@@ -92,6 +94,7 @@ export default Vue.extend({
             'all'
           )
         } else if (n.loadedTurn === n.turn && n.isRoundFinished) {
+          console.log('vote start')
           // vote start
           this.$gm.isRoundFinished = true
           this.$messages.pushSystemMessage(
@@ -160,6 +163,7 @@ export default Vue.extend({
   beforeDestroy() {
     this.$gm.detachPlayground()
     this.$gm.detachLineList()
+    this.$room.detachRoom()
   },
 })
 </script>

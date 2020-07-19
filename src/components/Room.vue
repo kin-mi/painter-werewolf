@@ -56,9 +56,6 @@ export default Vue.extend({
   mounted() {
     this.$room.attachRoom(this.room.id)
   },
-  beforeDestroy() {
-    this.$room.detachRoom()
-  },
   methods: {
     async closeRoom() {
       await this.$room.close(this.room.id)
