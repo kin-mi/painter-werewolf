@@ -292,14 +292,4 @@ export default Vue.extend({
   @apply w-full outline-none text-red-900 bg-opacity-25;
   background-color: rgba(198, 153, 159, var(--bg-opacity));
 }
-
-.modal-enter-active,
-.modal-leave-active {
-  @apply transition-opacity;
-}
-
-.modal-enter,
-.modal-leave-to {
-  @apply opacity-0 duration-300;
-}
 </style>

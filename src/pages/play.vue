@@ -7,13 +7,9 @@
       <PlayVoteModalForWolf v-else />
     </template>
     <template v-if="$gm.isGameFinished">
-      <div class="w-full">
-        <button
-          style="width: 104px; height: 26px; font-size: 6px;"
-          class="mt-2 hover:opacity-75 btn-primary"
-          type="button"
-          @click="$router.push('/lobby')"
-        >
+      <PlayResultModal />
+      <div class="w-full mt-5">
+        <button class="btn exit" type="button" @click="$router.push('/lobby')">
           ロビーへ戻る
         </button>
       </div>
@@ -27,6 +23,7 @@ import PlayerList from '~/components/PlayerList.vue'
 import PlayDrawStage from '~/components/PlayDrawStage.vue'
 import PlayVoteModalForPainter from '~/components/PlayVoteModalForPainter.vue'
 import PlayVoteModalForWolf from '~/components/PlayVoteModalForWolf.vue'
+import PlayResultModal from '~/components/PlayResultModal.vue'
 import { CurrentTurn } from '~/plugins/gameManager'
 import { DrawStatus } from '~/utils/constant'
 import { User } from '~/store/auth'
@@ -43,6 +40,7 @@ export default Vue.extend({
     PlayDrawStage,
     PlayVoteModalForPainter,
     PlayVoteModalForWolf,
+    PlayResultModal,
   },
   computed: {
     inited(): boolean {
@@ -174,5 +172,38 @@ export default Vue.extend({
   font-size: 80px;
   color: #35495e;
   letter-spacing: 1px;
+}
+
+.btn {
+  @apply relative;
+  @apply inline-flex items-center justify-center;
+  @apply w-32;
+  @apply m-1;
+  @apply rounded-full;
+  @apply tracking-widest;
+  box-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5) inset;
+}
+.btn:hover:not(:disabled),
+.btn:focus:not(:disabled) {
+  @apply transition-colors duration-300;
+  @apply outline-none;
+  @apply text-base-light;
+}
+.btn:disabled {
+  @apply cursor-default;
+  @apply text-base-light;
+  @apply border border-gray-500;
+  @apply bg-paint-gray;
+}
+
+.exit {
+  @apply border border-paint-blue;
+  @apply text-paint-blue;
+  @apply bg-paint-blue;
+  --bg-opacity: 0.15;
+}
+.exit:hover:not(:disabled),
+.exit:focus:not(:disabled) {
+  @apply bg-paint-blue;
 }
 </style>

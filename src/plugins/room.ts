@@ -353,7 +353,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
     switch (change.type) {
       case 'added':
         if (idx !== -1) break
-        state.list.push(romm)
+        state.list.unshift(romm)
         break
       case 'modified':
         if (idx === -1) break

@@ -31,6 +31,9 @@ module.exports = {
           black: '#221714',
         },
       },
+      transitionProperty: {
+        size: 'width, height',
+      },
     },
   },
   variants: {},

@@ -4,6 +4,7 @@ import Eye from 'vue-material-design-icons/EyeOutline.vue'
 import MessageText from 'vue-material-design-icons/MessageTextOutline.vue'
 import ArrowExpand from 'vue-material-design-icons/ArrowExpand.vue'
 import ArrowCollapse from 'vue-material-design-icons/ArrowCollapse.vue'
+import TransferRight from 'vue-material-design-icons/TransferRight.vue'
 
 /**
  * Import Material Icons
@@ -14,3 +15,4 @@ Vue.component('eye-icon', Eye)
 Vue.component('message-text', MessageText)
 Vue.component('arrow-expand', ArrowExpand)
 Vue.component('arrow-collapse', ArrowCollapse)
+Vue.component('transfer-right', TransferRight)

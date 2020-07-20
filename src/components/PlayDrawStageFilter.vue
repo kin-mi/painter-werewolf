@@ -18,8 +18,8 @@
 
     <template v-if="mode === 'otherTurn'">
       <div class="filter-other-drawing">
-        <p class="w-full">{{ currentUserName }}</p>
-        <p class="w-full">がお絵かき中...</p>
+        <p class="w-full" style="font-size: 5rem;">{{ currentUserName }}</p>
+        <p class="w-full text-5xl">お絵かき中...</p>
       </div>
     </template>
   </div>
@@ -121,7 +121,6 @@ export default Vue.extend({
 }
 .filter-other-drawing p {
   @apply text-paint-orange font-round select-none;
-  font-size: 5rem;
   animation: blink 1.5s ease-in-out infinite alternate;
 }
 </style>

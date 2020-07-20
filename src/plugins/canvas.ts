@@ -164,6 +164,7 @@ const CanvasPlugin: Plugin = (ctx, inject) => {
   function _mouseup() {
     if (!state.isDrawing || !_lastLine) return
     undoScrollEvent()
+    if (_lastLine.attrs.points.length <= 2) return
     state.isDrawing = false
     state.drawStatus = 'finish'
   }

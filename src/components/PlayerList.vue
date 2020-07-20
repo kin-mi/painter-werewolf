@@ -4,7 +4,10 @@
       v-for="user in onlineUsers"
       :key="user.id"
       class="list-wrapper"
-      :class="[cardWidth, user.id === currentUserId ? 'border-2' : 'border']"
+      :class="[
+        cardWidth,
+        user.id === currentUserId ? 'current-user' : 'border',
+      ]"
       :style="{
         'border-color': user.color,
         'background-color': user.color + '40',
@@ -85,6 +88,30 @@ export default Vue.extend({
   }
   .user-name {
     @apply text-sm;
+  }
+}
+.current-user {
+  @apply border-2;
+  animation: katakata 3s ease 0s infinite normal both;
+}
+@keyframes katakata {
+  0% {
+    transform: skewY(0deg);
+  }
+  77% {
+    transform: skewY(0deg);
+  }
+  80% {
+    transform: skewY(-5deg);
+  }
+  83% {
+    transform: skewY(5deg);
+  }
+  86% {
+    transform: skewY(0deg);
+  }
+  to {
+    transform: skewY(0deg);
   }
 }
 </style>

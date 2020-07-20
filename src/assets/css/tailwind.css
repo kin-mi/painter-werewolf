@@ -51,3 +51,13 @@ html, body {
 .material-design-icon svg {
   @apply inline-block;
 }
+
+.modal-enter-active,
+.modal-leave-active {
+  @apply transition-opacity;
+}
+
+.modal-enter,
+.modal-leave-to {
+  @apply opacity-0 duration-300;
+}
