@@ -13,11 +13,7 @@
 
         <!--Reult-->
         <div class="modal-result">
-          <template
-            v-if="
-              !!$gm.playground ? $gm.playground.result === 'painter' : false
-            "
-          >
+          <template v-if="$gm.playground.result === 'painter'">
             <div class="header win-painter">
               <p>画家の勝利</p>
             </div>

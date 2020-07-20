@@ -51,7 +51,9 @@ export default Vue.extend({
       voteResult: this.$gm.playground?.players.filter((e) => {
         return e.id !== this.$accessor.auth.user.id
       })[0].id,
-      voted: false,
+      voted: this.$gm.playground?.votes.some(
+        (e) => e.id === this.$accessor.auth.user.id
+      ),
     }
   },
   computed: {

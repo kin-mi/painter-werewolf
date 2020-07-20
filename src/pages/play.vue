@@ -1,14 +1,28 @@
 <template>
-  <div class="container">
+  <div class="container" :class="isGameFinished ? 'message-space' : ''">
     <PlayerList />
+    <div class="w-full">
+      <p
+        class="w-auto max-w-xs my-1 mx-auto px-4 bg-paint-orange bg-opacity-75 rounded-full"
+      >
+        テーマ「{{ $room.info.theme }}」
+      </p>
+    </div>
     <PlayDrawStage class="mt-2" />
+    <div class="w-full">
+      <p
+        class="w-auto max-w-xs my-2 mx-auto px-4 bg-paint-black bg-opacity-75 rounded-full text-white"
+      >
+        お題「{{ $gm.playground ? $gm.playground.answer : '' }}」
+      </p>
+    </div>
     <template v-if="$gm.isRoundFinished">
       <PlayVoteModalForPainter v-if="!isWerewolf" />
       <PlayVoteModalForWolf v-else />
     </template>
     <template v-if="$gm.isGameFinished">
-      <PlayResultModal />
-      <div class="w-full mt-5">
+      <PlayResultModal v-if="inited" />
+      <div class="w-full mt-3">
         <button class="btn exit" type="button" @click="$router.push('/lobby')">
           ロビーへ戻る
         </button>
@@ -44,7 +58,7 @@ export default Vue.extend({
   },
   computed: {
     inited(): boolean {
-      return !this.$gm.playground
+      return !!this.$gm.playground
     },
     currentTurn(): CurrentTurn | undefined {
       return this.$gm.playground?.currentTurn
@@ -165,6 +179,9 @@ export default Vue.extend({
 <style>
 .container {
   @apply flex flex-wrap content-start justify-center items-start text-center mx-auto;
+}
+.message-space {
+  padding-bottom: calc(12vh + 4rem);
 }
 
 .title {
