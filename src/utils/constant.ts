@@ -13,7 +13,7 @@ export type RoomStatus = typeof RoomStatus[number]
 /**
  * ユーザーステータス
  */
-const userStatus = ['online', 'offline', 'exit'] as const
+const userStatus = ['online', 'offline'] as const
 export type UserStatus = typeof userStatus[number]
 
 /**

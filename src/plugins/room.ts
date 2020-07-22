@@ -203,6 +203,54 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
 
   /******************************
+   * 再度入室する時の処理
+   * @param {string} uid
+   */
+  async function reJoin(uid: string): Promise<void> {
+    // 入室済みの部屋を検索
+    const roomCollectionRef = ctx.app.$fireStore
+      .collection('rooms' as CollectionName)
+      .where('players', 'array-contains', uid)
+      .where('status', '==', 'wait' as RoomStatus)
+      .limit(1)
+    const roomSnap = await roomCollectionRef.get()
+    if (roomSnap.empty) throw new Error('Not joined.')
+
+    const room = dataToRoom(roomSnap.docs[0].data())
+    const playersStatus = room.playersStatus.find((e) => e.id === uid)
+
+    // Start transaction.
+    await ctx.app.$fireStore
+      .runTransaction(async (trn) => {
+        const roomDocRef = ctx.app.$fireStore.collection('rooms').doc(room.id)
+        // 現在の部屋情報を取得
+        const roomSnap = await trn.get(roomDocRef)
+        if (!roomSnap.exists)
+          throw new Error(`Not found room. ${roomDocRef.id}`)
+        const userPayload = {
+          ...playersStatus,
+          status: 'online',
+        } as RoomUser
+
+        const playersStatusIdx = room.playersStatus.findIndex(
+          (e) => e.id === uid
+        )
+        room.playersStatus.splice(playersStatusIdx, 1, userPayload)
+
+        return trn.update(roomDocRef, {
+          playersStatus: room.playersStatus,
+          updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
+        } as Room)
+      })
+      .then(() => {
+        // set current room
+        if (room) {
+          state.currentRoom = room
+        }
+      })
+  }
+
+  /******************************
    * 部屋から退出する
    * @param {string} roomId
    */
@@ -219,20 +267,16 @@ const RoomPlugin: Plugin = (ctx, inject) => {
 
         const playersStatus = room.playersStatus.find((e) => e.id === user.id)
         if (playersStatus) {
-          // ユーザーリスト存在する場合、退室
-          const userPayload = {
-            ...playersStatus,
-            status: 'exit',
-          } as RoomUser
-
+          // ユーザーリスト存在する場合、削除
           const playersStatusIdx = room.playersStatus.findIndex(
             (e) => e.id === user.id
           )
-          room.playersStatus.splice(playersStatusIdx, 1, userPayload)
+          room.playersStatus.splice(playersStatusIdx, 1)
           return trn.update(roomDocRef, {
             playersStatus: room.playersStatus,
+            players: ctx.app.$fireStoreObj.FieldValue.arrayRemove(user.id),
             updateAt: ctx.app.$fireStoreObj.FieldValue.serverTimestamp(),
-          } as Room)
+          })
         }
       })
       .then(() => {
@@ -268,22 +312,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
 
   /******************************
-   * 再度入室する時の処理
-   * @param {string} uid
-   */
-  async function reJoin(uid: string): Promise<void> {
-    const roomCollectionRef = ctx.app.$fireStore
-      .collection('rooms' as CollectionName)
-      .where('players', 'array-contains', uid)
-      .where('status', '==', 'wait' as RoomStatus)
-      .limit(1)
-    const roomSnap = await roomCollectionRef.get()
-    if (roomSnap.empty) throw new Error('Not joined.')
-    const room = dataToRoom(roomSnap.docs[0].data())
-    state.currentRoom = room
-  }
-
-  /******************************
    * 指定したIDの部屋ステータスを取得する
    * @param {string} roomId
    */
@@ -304,7 +332,6 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    */
   function attachRoom(roomId: string): void {
     // detachRoom()
-
     _roomConnection = ctx.app.$fireStore
       .collection('rooms' as CollectionName)
       .doc(roomId)
@@ -314,6 +341,31 @@ const RoomPlugin: Plugin = (ctx, inject) => {
           state.currentRoom = dataToRoom(data)
         }
       })
+
+    // presence by RTDB
+    const userStatusDatabaseRef = ctx.app.$fireDb.ref(
+      '/status/' + ctx.app.$accessor.auth.user.id
+    )
+    ctx.app.$fireDb.ref('.info/connected').on('value', (snap) => {
+      // If we're not currently connected, don't do anything.
+      if (snap.val() === false) {
+        return
+      }
+      userStatusDatabaseRef
+        .onDisconnect()
+        .set({
+          state: 'offline',
+          roomId,
+          last_changed: ctx.app.$fireDbObj.ServerValue.TIMESTAMP,
+        })
+        .then(() => {
+          userStatusDatabaseRef.set({
+            state: 'online',
+            roomId,
+            last_changed: ctx.app.$fireDbObj.ServerValue.TIMESTAMP,
+          })
+        })
+    })
   }
   /******************************
    * 部屋情報をデタッチする

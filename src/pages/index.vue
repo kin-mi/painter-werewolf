@@ -23,6 +23,9 @@
     >
     <RuleDescription class="w-full mt-5" />
     <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
+    <div class="werewolf">
+      <img src="/images/werewolf_top.png" />
+    </div>
     <Copyright />
   </div>
 </template>
@@ -112,6 +115,7 @@ export default Vue.extend({
 
 <style>
 .top-container {
+  @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
   @apply min-h-screen  text-center mx-auto pb-16;
 }
@@ -121,5 +125,15 @@ export default Vue.extend({
   font-size: 80px;
   color: #35495e;
   letter-spacing: 1px;
+}
+
+.werewolf {
+  @apply fixed bottom-0 right-0;
+  @apply transform translate-x-10;
+  margin-bottom: 2rem;
+  @apply bg-fixed;
+}
+.werewolf img {
+  width: 50vw;
 }
 </style>

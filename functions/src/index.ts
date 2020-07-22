@@ -3,32 +3,70 @@ import * as admin from 'firebase-admin'
 admin.initializeApp()
 const firestore = admin.firestore()
 
-exports.onUserStatusChanged = functions.database
-  .ref('/status/{uid}')
+exports.onUserStatusChanged = functions
+  .region('asia-northeast1')
+  .database.ref('/status/{uid}')
   .onUpdate(async (change, context) => {
-    // Get the data written to Realtime Database
+    // 更新後のデータ（RTDB）
     const eventStatus = change.after.val()
-
-    // Then use other event data to create a reference to the
-    // corresponding Firestore document.
-    const userStatusFirestoreRef = firestore.doc(`status/${context.params.uid}`)
-
-    // It is likely that the Realtime Database change that triggered
-    // this event has already been overwritten by a fast change in
-    // online / offline status, so we'll re-read the current data
-    // and compare the timestamps.
     const statusSnapshot = await change.after.ref.once('value')
     const status = statusSnapshot.val()
-    console.log(status, eventStatus)
-    // If the current timestamp for this data is newer than
-    // the data that triggered this event, we exit this function.
+    // 前後関係のチェック
     if (status.last_changed > eventStatus.last_changed) {
       return null
     }
 
-    // Otherwise, we convert the last_changed field to a Date
-    eventStatus.last_changed = new Date(eventStatus.last_changed)
+    // Start transaction
+    await firestore.runTransaction(async (trn) => {
+      const roomDocRef = firestore.collection('rooms').doc(eventStatus.roomId)
+      // 現在の部屋情報を取得
+      const roomSnap = await trn.get(roomDocRef)
+      if (!roomSnap.exists) throw new Error(`Not found room. ${roomDocRef.id}`)
+      const room = roomSnap.data()!
+      const playersStatus = room.playersStatus.find(
+        (e: any) => e.id === context.params.uid
+      )
+      if (!playersStatus)
+        throw new Error(
+          `Player not found. Room ID:${roomDocRef.id} UID:${context.params.uid}`
+        )
 
-    // ... and write it to Firestore.
-    return userStatusFirestoreRef.set(eventStatus)
+      // 待機中に落ちた場合
+      if (
+        room.status === 'wait' &&
+        eventStatus.state === 'offline' &&
+        playersStatus.status === 'online'
+      ) {
+        const userPayload = {
+          ...playersStatus,
+          status: 'offline',
+        }
+        const playersStatusIdx = room.playersStatus.findIndex(
+          (e: any) => e.id === context.params.uid
+        )
+        room.playersStatus.splice(playersStatusIdx, 1, userPayload)
+        // 最後の1人の場合、部屋をクローズする
+        const roomStatus =
+          room.playersStatus.filter((e: any) => e.status === 'online').length >
+          0
+            ? 'wait'
+            : 'close'
+
+        return trn.update(roomDocRef, {
+          playersStatus: room.playersStatus,
+          status: roomStatus,
+          updateAt: new Date(eventStatus.last_changed),
+        })
+      }
+      // プレイ中の場合
+      // 自分のターンの場合
+      // 投票中、かつ未投票の場合
+      return undefined
+      // // 遊戯情報の取得
+      // const playgroundSnap = await roomDocRef.collection('playground').get()
+      // const playground = playgroundSnap.empty
+      //   ? undefined
+      //   : playgroundSnap.docs[0].data()
+    })
+    return undefined
   })

@@ -130,7 +130,10 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
       })
 
       // playground payload
-      const shufflePlayers = shuffle(room.playersStatus).map((e, i) => ({
+      const roomPlayers = room.playersStatus.filter(
+        (e) => e.status === 'online'
+      )
+      const shufflePlayers = shuffle(roomPlayers).map((e, i) => ({
         ...e,
         order: i,
       }))

@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex flex-wrap justify-center">
     <div
-      v-for="user in onlineUsers"
+      v-for="user in users"
       :key="user.id"
       class="list-wrapper"
       :class="[
@@ -13,7 +13,7 @@
         'background-color': user.color + '40',
       }"
     >
-      <p v-if="onlineUsers.length <= 5" class="w-full mt-1">
+      <p v-if="users.length <= 5" class="w-full mt-1">
         <img
           :src="userIcon(user.icon)"
           class="user-icon"
@@ -21,6 +21,9 @@
         />
       </p>
       <p class="user-name">{{ user.playerName }}</p>
+      <div v-if="user.status === 'offline'" class="offline-filter">
+        <p>OFFLINE</p>
+      </div>
     </div>
   </div>
 </template>
@@ -31,9 +34,9 @@ import { IconFileName } from '~/utils/constant'
 
 export default Vue.extend({
   computed: {
-    onlineUsers(): RoomUser[] {
+    users(): RoomUser[] {
       if (this.$gm.playground) {
-        return this.$gm.playground.players.filter((e) => e.status === 'online')
+        return this.$gm.playground.players
       } else {
         return this.$room.info.playersStatus.filter(
           (e) => e.status === 'online'
@@ -44,9 +47,9 @@ export default Vue.extend({
       return this.$gm.playground?.currentTurn?.painter || ''
     },
     cardWidth(): string {
-      return this.onlineUsers.length <= 3
+      return this.users.length <= 3
         ? 'w-1/4'
-        : this.onlineUsers.length === 4
+        : this.users.length === 4
         ? 'w-1/5'
         : 'w-1/6'
     },
@@ -66,6 +69,7 @@ export default Vue.extend({
 </script>
 <style scoped>
 .list-wrapper {
+  @apply relative;
   @apply h-auto mt-1 mr-1 pb-1 bg-white bg-opacity-50 rounded-lg;
   max-width: 10rem;
   min-height: 2.15rem;
@@ -113,5 +117,15 @@ export default Vue.extend({
   to {
     transform: skewY(0deg);
   }
+}
+.offline-filter {
+  @apply absolute top-0 left-0 bottom-0 w-full h-full;
+  @apply flex justify-center items-center;
+  @apply bg-gray-500 rounded-md opacity-75;
+  @apply font-bold text-lg;
+}
+.offline-filter p {
+  @apply transform;
+  --transform-rotate: 15deg;
 }
 </style>
