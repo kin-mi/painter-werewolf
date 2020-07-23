@@ -90,6 +90,7 @@ export default Vue.extend({
 .chat-area {
   @apply w-auto h-full;
   max-height: 40vh;
+  min-height: 12vh;
   @apply overflow-auto;
   @apply bg-white bg-opacity-50 border-t border-green-800 rounded-t-sm shadow;
 }

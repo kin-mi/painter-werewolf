@@ -26,10 +26,7 @@ exports.onUserStatusChanged = functions
       const playersStatus = room.playersStatus.find(
         (e: any) => e.id === context.params.uid
       )
-      if (!playersStatus)
-        throw new Error(
-          `Player not found. Room ID:${roomDocRef.id} UID:${context.params.uid}`
-        )
+      if (!playersStatus) return undefined
 
       // 待機中に落ちた場合
       if (

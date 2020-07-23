@@ -87,15 +87,22 @@
         </li>
       </ul>
     </div>
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="werewolf">
+          <img src="/images/werewolf_top.png" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <style scoped>
 .wrapper {
   @apply max-w-xs;
   @apply mx-auto;
-  @apply pt-2 pb-4 px-4;
-  @apply rounded-lg;
+  @apply pt-2 pb-5 px-4;
   @apply bg-white bg-opacity-75;
+  @apply border-t-2 border-r-2 border-l-2 border-paint-brown rounded-t-lg;
 }
 @screen md {
   .wrapper {
@@ -127,5 +134,36 @@
 }
 .list li span {
   @apply text-paint-brown;
+}
+
+.footer-wrapper {
+  @apply sticky bottom-0 w-full;
+}
+.footer {
+  @apply relative;
+  @apply max-w-xs;
+  height: 50px;
+  @apply mx-auto;
+  @apply bg-white bg-opacity-75;
+  @apply border-b-2 border-r-2 border-l-2 border-paint-brown rounded-b-lg;
+}
+@screen md {
+  .footer {
+    @apply max-w-md;
+  }
+}
+.werewolf {
+  @apply absolute top-0 right-0;
+  @apply transform;
+  --transform-translate-y: -40%;
+  --transform-translate-x: 50%;
+}
+.werewolf img {
+  z-index: 9999;
+  max-height: 35vh;
+  filter: drop-shadow(2px 0px 1px white) drop-shadow(-2px 0px 1px white)
+    drop-shadow(0px -2px 1px white) drop-shadow(-2px 0px 1px white)
+    drop-shadow(2px 2px 1px white) drop-shadow(-2px 2px 1px white)
+    drop-shadow(2px -2px 1px white) drop-shadow(-2px -2px 1px white);
 }
 </style>
