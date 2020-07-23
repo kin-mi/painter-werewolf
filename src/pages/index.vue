@@ -114,7 +114,7 @@ export default Vue.extend({
 .top-container {
   @apply relative;
   @apply flex flex-wrap content-start justify-center items-start;
-  @apply min-h-screen  text-center mx-auto pb-16;
+  @apply min-h-screen  text-center mx-auto;
 }
 
 .title {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div sticky-container>
     <div class="wrapper">
       <h2 class="text-paint-brown font-bold text-2xl">ルール説明</h2>
       <h3 class="badge mt-2">
@@ -87,10 +87,12 @@
         </li>
       </ul>
     </div>
-    <div class="footer-wrapper">
+    <div v-sticky class="footer-wrapper" sticky-side="bottom">
       <div class="footer">
-        <div class="werewolf">
-          <img src="/images/werewolf_top.png" />
+        <div class="footer-box">
+          <div class="werewolf">
+            <img src="/images/werewolf_top.png" />
+          </div>
         </div>
       </div>
     </div>
@@ -137,15 +139,39 @@
 }
 
 .footer-wrapper {
-  @apply sticky bottom-0 w-full;
+  @apply w-full;
+  height: 100px;
 }
 .footer {
-  @apply relative;
   @apply max-w-xs;
   height: 50px;
   @apply mx-auto;
+}
+.footer-box {
+  @apply relative h-full;
+  width: 90%;
   @apply bg-white bg-opacity-75;
   @apply border-b-2 border-r-2 border-l-2 border-paint-brown rounded-b-lg;
+}
+.footer-box::before {
+  @apply z-20;
+  content: '';
+  position: absolute;
+  top: 30%;
+  right: -24px;
+  margin-top: -12px;
+  border: 12px solid transparent;
+  border-left: 12px solid #fff;
+}
+.footer-box:after {
+  @apply z-10;
+  content: '';
+  position: absolute;
+  top: 30%;
+  right: -28px;
+  margin-top: -13px;
+  border: 13px solid transparent;
+  border-left: 13px solid theme('colors.paint.brown');
 }
 @screen md {
   .footer {
@@ -155,11 +181,11 @@
 .werewolf {
   @apply absolute top-0 right-0;
   @apply transform;
-  --transform-translate-y: -40%;
-  --transform-translate-x: 50%;
+  --transform-translate-y: -25%;
+  --transform-translate-x: 80%;
 }
 .werewolf img {
-  z-index: 9999;
+  @apply z-10;
   max-height: 35vh;
   filter: drop-shadow(2px 0px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(0px -2px 1px white) drop-shadow(-2px 0px 1px white)

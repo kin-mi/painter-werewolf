@@ -65,15 +65,15 @@ html {
 }
 
 #__nuxt {
-  /* overflow: hidden; */
-  clip-path: polygon(
+  overflow: hidden;
+  /* clip-path: polygon(
     0% 0px,
     0% 100%,
     100% 100%,
     100% 0%,
     calc(100% - 0px) 0%,
     calc(100% - 0px) 00px
-  );
+  ); */
 }
 
 #content {
