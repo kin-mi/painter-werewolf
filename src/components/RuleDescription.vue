@@ -125,7 +125,7 @@ export default Vue.extend({
   },
   mounted() {
     this.$nextTick(() => {
-      const stickyElement = this.$refs.sticky as Element
+      const stickyElement = this.$refs.sticky as HTMLElement
       this.stickyTop = stickyElement.getBoundingClientRect().top
       this.stickyHeight = stickyElement.offsetHeight
       this.stickyController()
