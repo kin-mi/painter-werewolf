@@ -87,12 +87,7 @@
         </li>
       </ul>
     </div>
-    <vue-position-sticky
-      ref="sticky"
-      :offset-bottom="0"
-      sticky-class="footer-wrapper"
-      @change="handleSticky"
-    >
+    <div ref="sticky" class="footer-wrapper" :class="isSticky ? 'sticky' : ''">
       <div class="footer">
         <div class="footer-box">
           <div class="werewolf">
@@ -100,20 +95,67 @@
           </div>
         </div>
       </div>
-    </vue-position-sticky>
+    </div>
+    <div v-if="isSticky" class="w-full" :style="`height: ${stickyHeight}px;`" />
   </div>
 </template>
 <script lang="ts">
 import Vue from 'vue'
 
 export default Vue.extend({
+  data(): {
+    isSticky: boolean
+    stickyTop: number
+    stickyHeight: number
+  } {
+    return {
+      isSticky: false,
+      stickyTop: 0,
+      stickyHeight: 0,
+    }
+  },
+  computed: {
+    scrollBottom(): number {
+      const windowHeight = Math.min(
+        window.innerWidth,
+        window.parent.screen.width
+      )
+      return window.scrollY + windowHeight
+    },
+  },
   mounted() {
-    // 初回ロード時にstickyが設定されないため暫定対応
-    this.$refs.sticky.handleScroll()
+    this.$nextTick(() => {
+      this.stickyTop = this.$refs.sticky.getBoundingClientRect().top
+
+      this.stickyHeight = this.$refs.sticky.offsetHeight
+      this.stickyController()
+      window.addEventListener('scroll', this.stickyController)
+    })
   },
   methods: {
-    handleSticky(isSticky) {
-      console.log('handleSticky', isSticky)
+    stickyController() {
+      const windowHeight = Math.min(
+        window.innerWidth,
+        window.parent.screen.width
+      )
+      const scrollTop =
+        document.documentElement.scrollTop || document.body.scrollTop
+      console.log({
+        stickyTop: this.stickyTop,
+        stickyHeight: this.stickyHeight,
+        windowHeight,
+        scrollTop,
+      })
+      console.log(
+        'element pos',
+        this.stickyTop + this.stickyHeight,
+        'scroll pos',
+        windowHeight + scrollTop,
+        this.stickyTop + this.stickyHeight >= windowHeight + scrollTop
+      )
+      if (this.stickyTop + this.stickyHeight >= windowHeight + scrollTop)
+        this.isSticky = true
+      else this.isSticky = false
     },
   },
 })
@@ -167,7 +209,7 @@ export default Vue.extend({
 
 .footer-wrapper {
   @apply w-full;
-  height: 100px;
+  /* height: 100px; */
 }
 .footer {
   @apply max-w-xs;
@@ -207,16 +249,19 @@ export default Vue.extend({
 }
 .werewolf {
   @apply absolute top-0 right-0;
-}
-.werewolf img {
-  @apply z-10;
   @apply transform;
   --transform-translate-y: -35%;
   --transform-translate-x: 80%;
+}
+.werewolf img {
+  @apply z-10;
   max-height: 35vh;
   filter: drop-shadow(2px 0px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(0px -2px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(2px 2px 1px white) drop-shadow(-2px 2px 1px white)
     drop-shadow(2px -2px 1px white) drop-shadow(-2px -2px 1px white);
+}
+.sticky {
+  @apply fixed bottom-0;
 }
 </style>
