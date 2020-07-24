@@ -1,5 +1,5 @@
 <template>
-  <div sticky-container>
+  <div data-sticky-container>
     <div class="wrapper">
       <h2 class="text-paint-brown font-bold text-2xl">ルール説明</h2>
       <h3 class="badge mt-2">
@@ -87,7 +87,12 @@
         </li>
       </ul>
     </div>
-    <div v-sticky class="footer-wrapper" sticky-side="bottom">
+    <vue-position-sticky
+      ref="sticky"
+      :offset-bottom="0"
+      sticky-class="footer-wrapper"
+      @change="handleSticky"
+    >
       <div class="footer">
         <div class="footer-box">
           <div class="werewolf">
@@ -95,16 +100,38 @@
           </div>
         </div>
       </div>
-    </div>
+    </vue-position-sticky>
   </div>
 </template>
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
+  mounted() {
+    // 初回ロード時にstickyが設定されないため暫定対応
+    this.$refs.sticky.handleScroll()
+  },
+  methods: {
+    handleSticky(isSticky) {
+      console.log('handleSticky', isSticky)
+    },
+  },
+})
+</script>
+
 <style scoped>
+.footer-space {
+  margin-bottom: 100px;
+}
 .wrapper {
   @apply max-w-xs;
+  max-width: 256px;
   @apply mx-auto;
   @apply pt-2 pb-5 px-4;
   @apply bg-white bg-opacity-75;
   @apply border-t-2 border-r-2 border-l-2 border-paint-brown rounded-t-lg;
+  @apply transform;
+  --transform-translate-x: -32px;
 }
 @screen md {
   .wrapper {
@@ -144,13 +171,13 @@
 }
 .footer {
   @apply max-w-xs;
-  height: 50px;
+  height: 30px;
   @apply mx-auto;
 }
 .footer-box {
   @apply relative h-full;
-  width: 90%;
-  @apply bg-white bg-opacity-75;
+  width: 80%;
+  background-color: #fffcf7;
   @apply border-b-2 border-r-2 border-l-2 border-paint-brown rounded-b-lg;
 }
 .footer-box::before {
@@ -180,12 +207,12 @@
 }
 .werewolf {
   @apply absolute top-0 right-0;
-  @apply transform;
-  --transform-translate-y: -25%;
-  --transform-translate-x: 80%;
 }
 .werewolf img {
   @apply z-10;
+  @apply transform;
+  --transform-translate-y: -35%;
+  --transform-translate-x: 80%;
   max-height: 35vh;
   filter: drop-shadow(2px 0px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(0px -2px 1px white) drop-shadow(-2px 0px 1px white)

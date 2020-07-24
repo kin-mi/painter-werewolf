@@ -42,7 +42,7 @@ const config: Configuration = {
     '~/plugins/gameManager',
     '~/plugins/canvas',
     '~/plugins/icons',
-    '~/plugins/sticky',
+    '~/plugins/sticky.js',
   ],
   /*
    ** Nuxt.js dev-modules
