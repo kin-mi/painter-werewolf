@@ -140,19 +140,19 @@ export default Vue.extend({
       )
       const scrollTop =
         document.documentElement.scrollTop || document.body.scrollTop
-      console.log({
-        stickyTop: this.stickyTop,
-        stickyHeight: this.stickyHeight,
-        windowHeight,
-        scrollTop,
-      })
-      console.log(
-        'element pos',
-        this.stickyTop + this.stickyHeight,
-        'scroll pos',
-        windowHeight + scrollTop,
-        this.stickyTop + this.stickyHeight >= windowHeight + scrollTop
-      )
+      // console.log({
+      //   stickyTop: this.stickyTop,
+      //   stickyHeight: this.stickyHeight,
+      //   windowHeight,
+      //   scrollTop,
+      // })
+      // console.log(
+      //   'element pos',
+      //   this.stickyTop + this.stickyHeight,
+      //   'scroll pos',
+      //   windowHeight + scrollTop,
+      //   this.stickyTop + this.stickyHeight >= windowHeight + scrollTop
+      // )
       if (this.stickyTop + this.stickyHeight >= windowHeight + scrollTop)
         this.isSticky = true
       else this.isSticky = false
