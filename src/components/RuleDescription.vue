@@ -125,9 +125,9 @@ export default Vue.extend({
   },
   mounted() {
     this.$nextTick(() => {
-      this.stickyTop = this.$refs.sticky.getBoundingClientRect().top
-
-      this.stickyHeight = this.$refs.sticky.offsetHeight
+      const stickyElement = this.$refs.sticky as Element
+      this.stickyTop = stickyElement.getBoundingClientRect().top
+      this.stickyHeight = stickyElement.offsetHeight
       this.stickyController()
       window.addEventListener('scroll', this.stickyController)
     })
