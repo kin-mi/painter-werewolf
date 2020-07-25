@@ -1,5 +1,5 @@
 <template>
-  <div data-sticky-container>
+  <div class="flex flex-wrap max-w-lg px-3">
     <div class="wrapper">
       <h2 class="text-paint-brown font-bold text-2xl">ルール説明</h2>
       <h3 class="badge mt-2">
@@ -87,16 +87,15 @@
         </li>
       </ul>
     </div>
-    <div ref="sticky" class="footer-wrapper" :class="isSticky ? 'sticky' : ''">
-      <div class="footer">
-        <div class="footer-box">
-          <div class="werewolf">
-            <img src="/images/werewolf_top.png" />
-          </div>
-        </div>
-      </div>
+    <div
+      v-if="isSticky"
+      class="footer-sticky-bg"
+      :class="isSticky ? 'sticky' : ''"
+    />
+    <div ref="sticky" class="footer" :class="isSticky ? 'sticky' : ''">
+      <img src="/images/werewolf_top.png" />
     </div>
-    <div v-if="isSticky" class="w-full" :style="`height: ${stickyHeight}px;`" />
+    <div v-if="isSticky" ref="sticky-mark" class="sticky-mark" />
   </div>
 </template>
 <script lang="ts">
@@ -116,45 +115,34 @@ export default Vue.extend({
   },
   computed: {
     scrollBottom(): number {
-      const windowHeight = Math.min(
-        window.innerWidth,
-        window.parent.screen.width
-      )
+      const windowHeight = window.parent.screen.width
       return window.scrollY + windowHeight
     },
   },
   mounted() {
     this.$nextTick(() => {
-      const stickyElement = this.$refs.sticky as HTMLElement
-      this.stickyTop = stickyElement.getBoundingClientRect().top
-      this.stickyHeight = stickyElement.offsetHeight
       this.stickyController()
       window.addEventListener('scroll', this.stickyController)
     })
   },
   methods: {
     stickyController() {
+      // 画面の高さ＋スクロール量で表示されてる最下部の座標を取得
       const windowHeight = Math.min(
-        window.innerWidth,
-        window.parent.screen.width
+        window.innerHeight,
+        window.parent.screen.height
       )
       const scrollTop =
         document.documentElement.scrollTop || document.body.scrollTop
-      // console.log({
-      //   stickyTop: this.stickyTop,
-      //   stickyHeight: this.stickyHeight,
-      //   windowHeight,
-      //   scrollTop,
-      // })
-      // console.log(
-      //   'element pos',
-      //   this.stickyTop + this.stickyHeight,
-      //   'scroll pos',
-      //   windowHeight + scrollTop,
-      //   this.stickyTop + this.stickyHeight >= windowHeight + scrollTop
-      // )
-      if (this.stickyTop + this.stickyHeight >= windowHeight + scrollTop)
-        this.isSticky = true
+      const viewBottomPos = windowHeight + scrollTop
+
+      // sticky要素の絶対座標を取得
+      const stickyElement = this.isSticky
+        ? (this.$refs['sticky-mark'] as HTMLElement)
+        : (this.$refs.sticky as HTMLElement)
+      const stickyBottom =
+        stickyElement.getBoundingClientRect().bottom + window.pageYOffset
+      if (stickyBottom >= viewBottomPos) this.isSticky = true
       else this.isSticky = false
     },
   },
@@ -162,23 +150,11 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.footer-space {
-  margin-bottom: 100px;
-}
 .wrapper {
-  @apply max-w-xs;
-  max-width: 256px;
-  @apply mx-auto;
+  @apply w-4/5  max-w-xs;
   @apply pt-2 pb-5 px-4;
   @apply bg-white bg-opacity-75;
   @apply border-t-2 border-r-2 border-l-2 border-paint-brown rounded-t-lg;
-  @apply transform;
-  --transform-translate-x: -32px;
-}
-@screen md {
-  .wrapper {
-    @apply max-w-md;
-  }
 }
 
 .badge {
@@ -201,67 +177,73 @@ export default Vue.extend({
   @apply text-left text-sm;
 }
 .list li {
-  @apply text-paint-brown;
+  @apply pl-3 text-paint-brown;
 }
 .list li span {
   @apply text-paint-brown;
 }
 
-.footer-wrapper {
-  @apply w-full;
-  /* height: 100px; */
-}
 .footer {
+  @apply relative;
+  @apply w-4/5 max-w-xs;
+  @apply bg-white bg-opacity-75;
+  height: 40px;
+  @apply border-b-2 border-r-2 border-l-2 border-paint-brown;
+  @apply rounded-b-lg;
+}
+.footer.sticky {
   @apply max-w-xs;
-  height: 30px;
-  @apply mx-auto;
+  width: calc(80% - 1.5rem + 5px);
+  @apply bg-transparent;
 }
-.footer-box {
-  @apply relative h-full;
-  width: 80%;
-  background-color: #fffcf7;
-  @apply border-b-2 border-r-2 border-l-2 border-paint-brown rounded-b-lg;
-}
-.footer-box::before {
+.footer::before {
   @apply z-20;
   content: '';
   position: absolute;
   top: 30%;
-  right: -24px;
+  right: -23px;
   margin-top: -12px;
   border: 12px solid transparent;
   border-left: 12px solid #fff;
 }
-.footer-box:after {
+.footer:after {
   @apply z-10;
   content: '';
   position: absolute;
   top: 30%;
-  right: -28px;
+  right: -27px;
   margin-top: -13px;
   border: 13px solid transparent;
   border-left: 13px solid theme('colors.paint.brown');
 }
-@screen md {
-  .footer {
-    @apply max-w-md;
-  }
+.footer-sticky-bg {
+  @apply max-w-xs;
+  height: 40px;
+  width: calc(80% - 1.5rem + 5px);
+  border-bottom: 8px solid #fffcf7;
+  @apply transform translate-y-px;
+  /* --transform-translate-y: 10px; */
 }
-.werewolf {
+
+.footer img {
   @apply absolute top-0 right-0;
+  height: 220px;
   @apply transform;
-  --transform-translate-y: -35%;
-  --transform-translate-x: 80%;
-}
-.werewolf img {
-  @apply z-10;
-  max-height: 35vh;
+  --transform-translate-y: -80px;
+  --transform-translate-x: 85%;
   filter: drop-shadow(2px 0px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(0px -2px 1px white) drop-shadow(-2px 0px 1px white)
     drop-shadow(2px 2px 1px white) drop-shadow(-2px 2px 1px white)
     drop-shadow(2px -2px 1px white) drop-shadow(-2px -2px 1px white);
 }
+
 .sticky {
   @apply fixed bottom-0;
+}
+.sticky-mark {
+  @apply max-w-xs;
+  height: 40px;
+  width: calc(80% - 1.5rem + 4px);
+  @apply bg-white bg-opacity-75;
 }
 </style>

@@ -22,7 +22,11 @@
       >ロビーへ入る</LoginButton
     >
     <RuleDescription class="w-full mt-5" />
-    <LoginButton class="w-full mt-3" @click="login">ロビーへ入る</LoginButton>
+    <div class="w-full max-w-lg mt-3">
+      <LoginButton class="w-4/5 max-w-xs" @click="login"
+        >ロビーへ入る</LoginButton
+      >
+    </div>
     <Copyright />
   </div>
 </template>

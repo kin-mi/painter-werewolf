@@ -20,7 +20,6 @@
     "nuxt-typed-vuex": "^0.1.19",
     "nuxt-webfontloader": "^1.1.0",
     "vue-material-design-icons": "^4.7.1",
-    "vue-position-sticky": "^0.2.1",
     "vue-scrollto": "^2.18.1"
   },
   "devDependencies": {
