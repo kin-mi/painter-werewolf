@@ -21,17 +21,20 @@
       @click="login"
       >ロビーへ入る</LoginButton
     >
-    <div class="w-full">
-      <RuleDescription class="w-full max-w-lg mx-auto px-3 mt-5" />
+    <div class="w-full z-10">
+      <RuleDescription
+        class="w-full max-w-lg mx-auto px-3 mt-5"
+        @open="ruleOpen = true"
+      />
     </div>
-    <div class="w-full">
+    <div v-if="ruleOpen" class="w-full">
       <div class="w-full max-w-lg mx-auto mt-3">
         <LoginButton class="w-4/5 max-w-xs" @click="login"
           >ロビーへ入る</LoginButton
         >
       </div>
     </div>
-    <Copyright />
+    <Copyright class="z-0" :class="ruleOpen ? '' : ['fixed', 'bottom-0']" />
   </div>
 </template>
 
@@ -62,6 +65,7 @@ export default Vue.extend({
             ) + 1
           )
         : '1',
+      ruleOpen: false,
     }
   },
   computed: {

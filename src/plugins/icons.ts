@@ -5,6 +5,7 @@ import MessageText from 'vue-material-design-icons/MessageTextOutline.vue'
 import ArrowExpand from 'vue-material-design-icons/ArrowExpand.vue'
 import ArrowCollapse from 'vue-material-design-icons/ArrowCollapse.vue'
 import TransferRight from 'vue-material-design-icons/TransferRight.vue'
+import MenuDown from 'vue-material-design-icons/MenuDown.vue'
 
 /**
  * Import Material Icons
@@ -16,3 +17,4 @@ Vue.component('message-text', MessageText)
 Vue.component('arrow-expand', ArrowExpand)
 Vue.component('arrow-collapse', ArrowCollapse)
 Vue.component('transfer-right', TransferRight)
+Vue.component('menu-down', MenuDown)
