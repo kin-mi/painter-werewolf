@@ -56,10 +56,7 @@ export default Vue.extend({
 </script>
 <style scoped>
 .wrapper {
-  @apply w-full;
-  @apply max-w-xs;
   @apply py-4;
-  @apply mx-auto mt-3;
   @apply bg-base-dark;
   @apply border-2 border-base-darkness;
   @apply shadow-inner;

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-wrap">
-    <div class="wrapper">
+    <div class="wrapper" :class="ruleOpen ? ['border-b-2', 'rounded-lg'] : ''">
       <h2
         class="text-paint-brown font-bold text-2xl"
         :class="ruleOpen ? '' : 'cursor-pointer'"
@@ -96,19 +96,15 @@
       </template>
     </div>
     <div
-      v-if="isSticky"
-      class="footer-sticky-bg"
-      :class="isSticky ? 'sticky' : ''"
-    />
-    <div ref="sticky" class="footer" :class="footerClass" @click="openRule">
-      <img src="/images/werewolf_top.png" />
+      v-if="!ruleOpen"
+      class="w-4/5 h-0 max-w-xs mx-auto border-t-2 border-paint-brown"
+      @click="openRule"
+    >
       <menu-down
-        v-if="!ruleOpen"
         :size="36"
         class="inline-block transform -translate-y-3 text-paint-brown"
       />
     </div>
-    <div v-if="isSticky" ref="sticky-mark" class="sticky-mark" />
   </div>
 </template>
 <script lang="ts">
@@ -161,10 +157,10 @@ export default Vue.extend({
       if (this.ruleOpen) return
       this.ruleOpen = true
       this.$emit('open')
-      this.$nextTick(() => {
-        this.stickyController()
-        window.addEventListener('scroll', this.stickyController)
-      })
+      // this.$nextTick(() => {
+      //   this.stickyController()
+      //   window.addEventListener('scroll', this.stickyController)
+      // })
     },
   },
 })
@@ -172,8 +168,8 @@ export default Vue.extend({
 
 <style scoped>
 .wrapper {
-  @apply w-4/5  max-w-xs;
-  @apply pt-2 pb-5 px-4;
+  @apply w-4/5 max-w-xs;
+  @apply mx-auto py-3 px-4;
   @apply bg-white bg-opacity-75;
   @apply border-t-2 border-r-2 border-l-2 border-paint-brown rounded-t-lg;
 }

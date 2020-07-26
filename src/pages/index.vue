@@ -6,9 +6,23 @@
         src="/images/logo_title.svg"
       />
     </h1>
+
+    <div class="w-full">
+      <RuleDescription
+        class="w-full max-w-lg mx-auto px-3 mt-5"
+        @open="ruleOpen = true"
+      />
+    </div>
+    <div class="w-full">
+      <img
+        src="/images/werewolf_top.png"
+        class="mx-auto"
+        style="max-height: 30vh;"
+      />
+    </div>
     <LoginForm
       ref="loginForm"
-      class="w-full"
+      class="w-full max-w-xs mx-auto mt-3"
       v-bind="$accessor.auth.user"
       :display-name.sync="displayName"
       :selected-icon.sync="selectedIcon"
@@ -21,19 +35,6 @@
       @click="login"
       >ロビーへ入る</LoginButton
     >
-    <div class="w-full z-10">
-      <RuleDescription
-        class="w-full max-w-lg mx-auto px-3 mt-5"
-        @open="ruleOpen = true"
-      />
-    </div>
-    <div v-if="ruleOpen" class="w-full">
-      <div class="w-full max-w-lg mx-auto mt-3">
-        <LoginButton class="w-4/5 max-w-xs" @click="login"
-          >ロビーへ入る</LoginButton
-        >
-      </div>
-    </div>
     <Copyright class="z-0" :class="ruleOpen ? '' : ['fixed', 'bottom-0']" />
   </div>
 </template>
