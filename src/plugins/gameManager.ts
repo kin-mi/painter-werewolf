@@ -59,6 +59,7 @@ export type Playground = {
   werewolf: string
   answer: string
   votes: Vote[]
+  lastPainter: string
   result: 'painter' | 'werewolf' | ''
   createAt?: Date | firestore.Timestamp
   updateAt?: Date | firestore.Timestamp
@@ -162,6 +163,7 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
         answer,
         votes: [],
         result: '',
+        lastPainter: '',
       }
       const playgroundDocRef = roomDocRef
         .collection('playground' as CollectionName)
@@ -274,24 +276,36 @@ const GameManagerPlugin: Plugin = (ctx, inject) => {
       if (!playgroundSnap.exists) return
       const playground = dataToPlayground(playgroundSnap.data()!)
 
-      // 現在の順番を取得
-      const currentPlayerIdx = playground.players.findIndex(
-        (e) => e.id === playground.currentTurn.painter
+      let currentUserStatus: 'online' | 'offline' | undefined
+      do {
+        const currentPlayerIdx = playground.players.findIndex(
+          (e) => e.id === playground.currentTurn.painter
+        )
+        if (playground.players[currentPlayerIdx + 1]) {
+          // 次のユーザーへ切り替え
+          playground.currentTurn.painter =
+            playground.players[currentPlayerIdx + 1].id
+          playground.currentTurn.turn++
+        } else if (playground.currentTurn.round === playground.round) {
+          // ラウンド終了
+          playground.lastPainter = playground.currentTurn.painter || ''
+          playground.currentTurn.painter = ''
+        } else {
+          // ラウンドを進めて先頭のユーザーへ切り替え
+          playground.currentTurn.painter = playground.players[0].id
+          playground.currentTurn.turn++
+          playground.currentTurn.round = playground.currentTurn.round + 1
+        }
+        currentUserStatus =
+          playground.players.find(
+            (e) => e.id === playground.currentTurn.painter
+          )?.status || undefined
+
+        // offlineユーザーの場合、次へ
+      } while (
+        currentUserStatus === 'offline' &&
+        playground.currentTurn.painter !== ''
       )
-      if (playground.players[currentPlayerIdx + 1]) {
-        // 次のユーザーへ切り替え
-        playground.currentTurn.painter =
-          playground.players[currentPlayerIdx + 1].id
-        playground.currentTurn.turn++
-      } else if (playground.currentTurn.round === playground.round) {
-        // ラウンド終了
-        playground.currentTurn.painter = ''
-      } else {
-        // ラウンドを進めて先頭のユーザーへ切り替え
-        playground.currentTurn.painter = playground.players[0].id
-        playground.currentTurn.turn++
-        playground.currentTurn.round = playground.currentTurn.round + 1
-      }
       state.playground = playground
       return trn.set(playgroundDocRef, {
         ...playground,

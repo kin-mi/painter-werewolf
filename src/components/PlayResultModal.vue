@@ -82,6 +82,7 @@
               </div>
               <div class="vote-list-box">
                 <div
+                  v-if="voteResult.target"
                   class="user-card"
                   :style="{
                     'border-color': voteResult.target.color,

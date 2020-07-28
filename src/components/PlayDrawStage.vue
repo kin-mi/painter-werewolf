@@ -23,6 +23,12 @@ export default Vue.extend({
         ? 'otherTurn'
         : 'none'
     },
+    turnHandler(): { isMyTurn: boolean; turn: number } {
+      return {
+        isMyTurn: this.$gm.isMyTurn,
+        turn: this.$gm.playground?.currentTurn?.turn || 0,
+      }
+    },
   },
   watch: {
     // "stop" => isMyTrun => "start" => Drawing => "finish" => "stop"
@@ -31,8 +37,14 @@ export default Vue.extend({
         this.$canvas.drawStatus = 'stop'
       }
     },
-    '$gm.isMyTurn'(n: boolean, o: boolean) {
-      if (n && !o && this.$canvas.drawStatus === 'stop') {
+    turnHandler(
+      n: { isMyTurn: boolean; turn: number },
+      o: { isMyTurn: boolean; turn: number }
+    ) {
+      if (
+        (n.isMyTurn && !o.isMyTurn && this.$canvas.drawStatus === 'stop') ||
+        (n.isMyTurn && o.isMyTurn && n.turn !== o.turn)
+      ) {
         this.$canvas.drawStatus = 'start'
       }
     },

@@ -326,6 +326,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
   }
 
   let _roomConnection: () => void | undefined
+  let _userStatusDatabaseRef: firebase.database.Reference
   /******************************
    * 部屋情報をアタッチする
    * @param {string} roomId
@@ -343,7 +344,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
       })
 
     // presence by RTDB
-    const userStatusDatabaseRef = ctx.app.$fireDb.ref(
+    _userStatusDatabaseRef = ctx.app.$fireDb.ref(
       '/status/' + ctx.app.$accessor.auth.user.id
     )
     ctx.app.$fireDb.ref('.info/connected').on('value', (snap) => {
@@ -351,7 +352,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
       if (snap.val() === false) {
         return
       }
-      userStatusDatabaseRef
+      _userStatusDatabaseRef
         .onDisconnect()
         .set({
           state: 'offline',
@@ -359,7 +360,7 @@ const RoomPlugin: Plugin = (ctx, inject) => {
           last_changed: ctx.app.$fireDbObj.ServerValue.TIMESTAMP,
         })
         .then(() => {
-          userStatusDatabaseRef.set({
+          _userStatusDatabaseRef.set({
             state: 'online',
             roomId,
             last_changed: ctx.app.$fireDbObj.ServerValue.TIMESTAMP,
@@ -372,6 +373,10 @@ const RoomPlugin: Plugin = (ctx, inject) => {
    */
   function detachRoom(): void {
     if (_roomConnection) _roomConnection()
+    if (_userStatusDatabaseRef) {
+      _userStatusDatabaseRef.remove()
+      _userStatusDatabaseRef.onDisconnect().cancel()
+    }
   }
 
   let _roomListConnection: () => void | undefined

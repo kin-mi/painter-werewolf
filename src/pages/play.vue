@@ -9,7 +9,7 @@
       </p>
     </div>
     <PlayDrawStage class="mt-2" />
-    <div class="w-full">
+    <div v-if="!isWerewolf" class="w-full">
       <p
         class="w-auto max-w-xs my-2 mx-auto px-4 bg-paint-black bg-opacity-75 rounded-full text-white"
       >
@@ -47,6 +47,7 @@ type CanvasHandler = {
   turn: number
   isMyTurn: boolean
   isRoundFinished: boolean
+  lastPainter: string
 }
 export default Vue.extend({
   components: {
@@ -64,6 +65,7 @@ export default Vue.extend({
       return this.$gm.playground?.currentTurn
     },
     isWerewolf(): boolean {
+      if (!this.$gm.playground) return true
       return this.$gm.playground?.werewolf === this.$accessor.auth.user.id
     },
     isRoundFinished(): boolean {
@@ -82,6 +84,7 @@ export default Vue.extend({
         turn: this.$gm.playground?.currentTurn?.turn,
         isMyTurn: this.$gm.isMyTurn,
         isRoundFinished: this.currentTurn?.painter === '',
+        lastPainter: this.$gm.playground?.lastPainter,
       }
     },
   },
@@ -93,7 +96,8 @@ export default Vue.extend({
           n.loadedTurn !== 0 &&
           n.loadedTurn === n.turn - 1 &&
           n.isMyTurn &&
-          !n.isRoundFinished
+          !n.isRoundFinished &&
+          !this.isGameFinished
         ) {
           // my turn
           this.$messages.pushSystemMessage(
@@ -103,7 +107,11 @@ export default Vue.extend({
             },
             'all'
           )
-        } else if (n.loadedTurn === n.turn && n.isRoundFinished) {
+        } else if (
+          ((n.loadedTurn === n.turn && n.isRoundFinished) ||
+            n.lastPainter === this.user.id) &&
+          !this.$gm.isRoundFinished
+        ) {
           // vote start
           this.$gm.isRoundFinished = true
           this.$messages.pushSystemMessage(
